@@ -19,14 +19,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
       />
 
       <div className="landing-hero-wrap">
-        <Image
-          src="/images/landing-hero.png"
-          alt="Bad Advice mascot"
-          width={768}
-          height={1024}
-          className="landing-hero"
-          priority
-        />
+        <div className="landing-hero" aria-hidden="true" />
 
         <div className="landing-overlay">
           <h1 className="landing-headline">
