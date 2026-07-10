@@ -19,7 +19,14 @@ export default function LandingPage({ onStart }: LandingPageProps) {
       />
 
       <div className="landing-hero-wrap">
-        <div className="landing-hero" aria-hidden="true" />
+        <div
+          className="landing-hero"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, rgba(0, 0, 0, 0) 5.53%, #000 91.12%), url('/images/landing-hero.png')",
+          }}
+          aria-hidden="true"
+        />
 
         <div className="landing-overlay">
           <h1 className="landing-headline">
