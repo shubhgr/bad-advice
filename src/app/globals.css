@@ -673,7 +673,7 @@ select.input-field {
   flex-shrink: 0;
   width: 100%;
   height: auto;
-  padding: 28px 20px 0;
+  padding: 40px 20px 0;
   box-sizing: border-box;
   object-fit: contain;
 }
@@ -689,8 +689,6 @@ select.input-field {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
-  border-right: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .landing-hero {
@@ -720,7 +718,7 @@ select.input-field {
   margin: 0;
   padding-left: 20px;
   padding-right: 20px;
-  padding-bottom: 60px;
+  padding-bottom: 40px;
   box-sizing: border-box;
 }
 
