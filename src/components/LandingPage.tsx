@@ -18,20 +18,6 @@ export default function LandingPage({ onStart }: LandingPageProps) {
         priority
       />
 
-      <div className="landing-copy">
-        <h1 className="landing-headline">
-          I specialise in Bad Advice.
-          <br />
-          Seriously.
-          <br />
-          You&apos;ll hate it.
-        </h1>
-
-        <button onClick={onStart} className="btn-accent landing-cta">
-          Give Me Bad Advice
-        </button>
-      </div>
-
       <div className="landing-hero-wrap">
         <Image
           src="/images/landing-hero.png"
@@ -41,6 +27,20 @@ export default function LandingPage({ onStart }: LandingPageProps) {
           className="landing-hero"
           priority
         />
+
+        <div className="landing-overlay">
+          <h1 className="landing-headline">
+            I specialise in Bad Advice.
+            <br />
+            Seriously.
+            <br />
+            You&apos;ll hate it.
+          </h1>
+
+          <button onClick={onStart} className="btn-accent landing-cta">
+            Give Me Bad Advice
+          </button>
+        </div>
       </div>
     </div>
   );
