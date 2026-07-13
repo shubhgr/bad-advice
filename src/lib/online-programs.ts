@@ -8,6 +8,7 @@ interface OnlineProgramRow {
   id: string;
   name: string;
   universityName: string;
+  source: string;
   aos: string;
   category: string;
   programCategory: string;
@@ -60,6 +61,7 @@ function loadPrograms(): OnlineProgramRow[] {
       id: row[index.id],
       name: row[index.name] ?? "",
       universityName: row[index.university_name] ?? "",
+      source: row[index.source] ?? "",
       aos: row[index.aos] ?? "",
       category: row[index.category] ?? "",
       programCategory: row[index.program_category] ?? "",
@@ -129,6 +131,7 @@ function toCourse(program: OnlineProgramRow): Course {
     id: program.id,
     courseName: program.name,
     university: program.universityName,
+    source: program.source,
     country: COUNTRY_NAMES[program.countryId] ?? "Online",
     duration: formatDuration(program.courseDuration, program.durationType),
     accreditation: formatAccreditation(program.type, program.degree),

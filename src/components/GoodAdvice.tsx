@@ -85,8 +85,8 @@ export default function GoodAdvice({
                   <p className="good-advice-program-cost">
                     Cost <span>{course.totalFees}</span>
                   </p>
-                  {course.university.trim() ? (
-                    <p className="good-advice-program-host">By {course.university}</p>
+                  {course.source.trim() ? (
+                    <p className="good-advice-program-host">By {course.source}</p>
                   ) : null}
                 </div>
               </a>

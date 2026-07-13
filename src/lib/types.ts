@@ -11,6 +11,7 @@ export interface Course {
   id: string;
   courseName: string;
   university: string;
+  source: string;
   country: string;
   duration: string;
   accreditation: string;
