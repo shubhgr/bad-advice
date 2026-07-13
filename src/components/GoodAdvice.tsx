@@ -64,16 +64,14 @@ export default function GoodAdvice({
             {recommendations.slice(0, 2).map((course, index) => (
               <a
                 key={course.id}
-                href={index === 0 ? course.applyUrl : SIGNUP_URL}
-                target={index === 0 ? "_blank" : "_top"}
+                href={SIGNUP_URL}
+                target="_top"
                 rel="noopener noreferrer"
                 className={
                   index === 0
                     ? "good-advice-program-card"
                     : "good-advice-program-card is-blurred-soft"
                 }
-                aria-hidden={index > 0 ? true : undefined}
-                tabIndex={index > 0 ? -1 : undefined}
               >
                 <div className="good-advice-program-top">
                   <h3 className="good-advice-program-name" title={course.courseName}>
@@ -87,7 +85,9 @@ export default function GoodAdvice({
                   <p className="good-advice-program-cost">
                     Cost <span>{course.totalFees}</span>
                   </p>
-                  <p className="good-advice-program-host">By {course.university}</p>
+                  {course.university.trim() ? (
+                    <p className="good-advice-program-host">By {course.university}</p>
+                  ) : null}
                 </div>
               </a>
             ))}
