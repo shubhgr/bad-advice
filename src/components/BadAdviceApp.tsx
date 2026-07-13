@@ -178,7 +178,7 @@ export default function BadAdviceApp() {
             <GoodAdvice
               aspirationalHeading={aspirationalHeading}
               advice={goodAdvice}
-              programCount={recommendations.length}
+              recommendations={recommendations}
             />
           )}
 
