@@ -127,8 +127,21 @@ export default function BadAdviceApp() {
     setError("");
   }
 
+  const showMovingGradient =
+    step === "getting-good-advice" || step === "good-advice";
+
   return (
     <div className="mobile-shell">
+      <div
+        className={`shell-moving-gradient${showMovingGradient ? " is-visible" : ""}`}
+        aria-hidden="true"
+      >
+        <span className="shell-gradient-blob shell-gradient-blob-a" />
+        <span className="shell-gradient-blob shell-gradient-blob-b" />
+        <span className="shell-gradient-blob shell-gradient-blob-c" />
+        <div className="shell-fluted-glass" />
+      </div>
+
       <div className="mobile-frame">
         <main className="mobile-content">
           {error && (
@@ -148,7 +161,7 @@ export default function BadAdviceApp() {
           {step === "getting-advice" && <GettingAdvice />}
 
           {step === "getting-good-advice" && (
-            <GettingAdvice message="Graddie is thinking..." />
+            <GettingAdvice message="Graddie is thinking..." softEnter />
           )}
 
           {step === "funny-advice" && (

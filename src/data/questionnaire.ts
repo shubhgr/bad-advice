@@ -9,37 +9,37 @@ export const BOLLYWOOD_CHARACTERS: BollywoodCharacter[] = [
   {
     id: "raju",
     name: "Raju",
-    personalityTrait: "Phir Hera Pheri",
+    personalityTrait: "Funny, chaotic & always scheming",
     image: "/images/characters/raju.png?v=2",
   },
   {
     id: "queen",
     name: "Rani",
-    personalityTrait: "Queen",
+    personalityTrait: "Innocent, Overthinker, Occasional Crier",
     image: "/images/characters/queen.png?v=2",
   },
   {
     id: "rancho",
     name: "Rancho",
-    personalityTrait: "3 Idiots",
+    personalityTrait: "Wise, Kind, Curious",
     image: "/images/characters/rancho.png?v=2",
   },
   {
     id: "om",
     name: "Om",
-    personalityTrait: "Om Shanti Om",
+    personalityTrait: "Dramatic, Loyal, Romantic",
     image: "/images/characters/om.png?v=2",
   },
   {
     id: "bunny",
     name: "Bunny",
-    personalityTrait: "Yeh Jawaani Hai Deewani",
+    personalityTrait: "Bold, Adventurous",
     image: "/images/characters/bunny.png?v=2",
   },
   {
     id: "geet",
     name: "Geet",
-    personalityTrait: "Jab We Met",
+    personalityTrait: "Witty & Unapologetically Herself",
     image: "/images/characters/geet.png?v=2",
   },
 ];

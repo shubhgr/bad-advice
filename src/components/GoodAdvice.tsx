@@ -20,7 +20,7 @@ export default function GoodAdvice({
     programCount === 1 ? "1 program" : `${programCount} programs`;
 
   return (
-    <div className="advice-screen animate-fade-in">
+    <div className="advice-screen good-advice-screen animate-advice-in">
       <div className="advice-screen-body">
         <div className="advice-main">
           <h3 className="advice-reveal-headline">{aspirationalHeading}</h3>

@@ -2,13 +2,17 @@
 
 interface GettingAdviceProps {
   message?: string;
+  softEnter?: boolean;
 }
 
 export default function GettingAdvice({
   message = "Thinking....",
+  softEnter = false,
 }: GettingAdviceProps) {
   return (
-    <div className="getting-advice-screen animate-fade-in">
+    <div
+      className={`getting-advice-screen ${softEnter ? "animate-advice-in" : "animate-fade-in"}`}
+    >
       <div className="getting-advice-visual">
         <div className="getting-advice-chakra-wrap" aria-hidden="true">
           <img
