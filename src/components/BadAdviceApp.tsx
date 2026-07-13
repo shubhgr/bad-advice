@@ -7,6 +7,7 @@ import GoodAdvice from "@/components/GoodAdvice";
 import GettingAdvice from "@/components/GettingAdvice";
 import Questionnaire from "@/components/Questionnaire";
 import RecommendationsScreen from "@/components/RecommendationsScreen";
+import Disclaimer from "@/components/Disclaimer";
 import { Course, UserResponses } from "@/lib/types";
 
 type Step =
@@ -188,6 +189,7 @@ export default function BadAdviceApp() {
             />
           )}
         </main>
+        {step !== "good-advice" && <Disclaimer />}
       </div>
     </div>
   );
