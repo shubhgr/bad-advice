@@ -23,43 +23,130 @@ Weird Food Combination: ${responses.weirdCombination}`;
 
 type AnchorField = "Bollywood Character" | "Superpower" | "Weird Food Combination";
 
-function getForcedAnchorField(responses: UserResponses): AnchorField {
-  const options: AnchorField[] = [
-    "Bollywood Character",
-    "Superpower",
-    "Weird Food Combination",
-  ];
-  const seed =
-    responses.bollywoodCharacter.length +
-    responses.superpower.length * 2 +
-    responses.weirdCombination.length * 3 +
-    responses.name.length * 5;
-  return options[seed % options.length];
+const ANCHOR_FIELDS: AnchorField[] = [
+  "Bollywood Character",
+  "Superpower",
+  "Weird Food Combination",
+];
+
+const GOOD_EXAMPLE_POOL_BY_ANCHOR: Record<"superpower" | "food" | "bollywood", string[]> = {
+  superpower: [
+    "Teleportation as your dream power tells me you already hate being anywhere for too long, so quit your job the second it gets slightly uncomfortable. Consistency was never the goal.",
+    "Since your superpower is invisibility and you wing it on everything, stop showing up to work entirely. Nobody will notice, and if they do, let them explain to HR why they even remember you.",
+    "Mind reading means you never actually listen to anyone, so stop letting people finish their sentences starting today, you already know what they're going to say, probably.",
+    "Immortality means you never had to face consequences on any real timeline, so quit saving money entirely, you have infinite time to fix it later, probably.",
+    "Flying was your pick, which means you've always wanted an excuse to leave a room mid conversation, so start doing that in every meeting starting tomorrow, just walk out.",
+    "Shape shifting means you never had to commit to being one version of yourself, so start showing up to every family event as a completely different person and let them figure it out.",
+    "You picked immortality, so stop making any decisions with urgency ever again, that promotion can wait a few centuries, what's the rush.",
+  ],
+  food: [
+    "Coke milk means you already ruined two good things by combining them, so go call your ex and your boss on the same phone call and see what happens.",
+    "Maggi with ketchup means you'll settle for the fastest fix available even when it makes things worse, so apply that same energy to your next big life decision and just wing it.",
+    "Fries with ice cream tells me you've never once let hot and cold coexist peacefully, so go mix your savings account and your credit card debt the same way and call it balance.",
+    "Cheetos with curd means you genuinely cannot leave one single thing simple, so take your resume, which is already fine, and add unnecessary complications to it starting tonight.",
+    "Khakhra and Nutella means you turned a diet snack into a dessert without asking permission from anyone, so rebrand your unemployment as a sabbatical and dare someone to correct you.",
+    "Pineapple on pizza means sweet and savory make sense to you when nothing else does, so mix your work slack and your family group chat into one and let chaos pick a side.",
+    "Coke milk was a bold choice nobody asked you to make, so make an equally bold choice nobody asked for and quit your job over text today.",
+  ],
+  bollywood: [
+    "Bunny ditched his own engagement to fly to Paris alone, so skip your next family function completely and don't explain why. Let them assume the worst.",
+    "You relate to Rancho the most, so walk into your next exam, humiliate the professor with a philosophical question, and get expelled with your dignity intact, that's the whole plot.",
+    "Om spent literal decades obsessing over one person, so pick one email you never sent and just keep almost sending it for the next twenty years, that's basically loyalty.",
+    "Geet talked to a total stranger about her entire life plan within minutes of meeting him, so tell your Uber driver everything about your career doubts tonight, he's basically a licensed therapist now.",
+    "Raju hustled and lied his way through every single scheme he ever ran, so exaggerate your job title on every form you fill out from now on, technically it's just optimism.",
+    "Queen got left alone in a foreign country and somehow turned it into a whole personality, so get dumped this week if you have to, character development doesn't wait for convenient timing.",
+  ],
+};
+
+function pickMixedExamples(count = 3 + Math.floor(Math.random() * 2)): string[] {
+  const buckets = Object.values(GOOD_EXAMPLE_POOL_BY_ANCHOR).map((examples) =>
+    pickRandomSubset(examples, examples.length)
+  );
+  const picked: string[] = [];
+
+  // Prefer one from each anchor type first
+  for (const bucket of pickRandomSubset(buckets, buckets.length)) {
+    if (picked.length >= count) break;
+    const next = bucket.find((example) => !picked.includes(example));
+    if (next) picked.push(next);
+  }
+
+  // Fill remaining slots from any leftover examples
+  const leftovers = buckets.flat().filter((example) => !picked.includes(example));
+  return [...picked, ...pickRandomSubset(leftovers, count - picked.length)];
 }
 
-function buildBadAdvicePrompt(responses: UserResponses): string {
-  const forcedAnchor = getForcedAnchorField(responses);
+const ENTROPY_WORDS = [
+  "ember",
+  "circuit",
+  "mirage",
+  "static",
+  "orbit",
+  "glitch",
+  "copper",
+  "velvet",
+  "cascade",
+  "prism",
+  "harbor",
+  "neon",
+  "fossil",
+  "rift",
+  "signal",
+  "quartz",
+];
+
+function pickRandom<T>(items: T[]): T {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function pickRandomSubset<T>(items: T[], count: number): T[] {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
+
+function getForcedAnchorField(): AnchorField {
+  return pickRandom(ANCHOR_FIELDS);
+}
+
+function getPromptEntropy(): { seed: number; word: string } {
+  return {
+    seed: Math.floor(Math.random() * 9000) + 1000,
+    word: pickRandom(ENTROPY_WORDS),
+  };
+}
+
+function buildBadAdvicePrompt(
+  responses: UserResponses,
+  forcedAnchor: AnchorField = getForcedAnchorField()
+): string {
+  const examples = pickMixedExamples();
+  const entropy = getPromptEntropy();
+  const exampleBlock = examples.map((example) => `"${example}"`).join("\n");
 
   return `You write BRUTALLY BAD, savage, absurd advice as a joke. Deliberately terrible. Never practical. Never helpful. It does NOT have to be about careers, it can be about their life, habits, personality, hygiene, social life, plans, anything. Their career or quiz info is just raw material for the joke, not the required topic.
 
 USER DATA:
 ${profileSummary(responses)}
 
-OPTIONAL FORCED ANCHOR: ${forcedAnchor}
+FORCED ANCHOR: ${forcedAnchor}
+You MUST build the entire joke around this exact field and ignore the other two weird fields completely. Do not blend in a second one.
 
-CRITICAL, PICK YOUR ANCHOR FIELD DELIBERATELY, DO NOT DEFAULT TO FOOD OR BOLLYWOOD OUT OF HABIT:
-If OPTIONAL FORCED ANCHOR above names a specific field, Bollywood Character, Superpower, or Weird Food Combination, you MUST build the entire joke around that exact field and ignore the other two weird fields completely, do not blend in a second one.
-If no forced anchor is given, you must still actively choose between all three weird fields as if flipping a mental coin, do not let Weird Food Combination win by default just because it feels easiest. Superpower requires real invention since it has no built in story, prioritize genuinely trying it, same for really digging into Bollywood Character traits beyond the obvious "always chasing something new" idea. Across many generations, no single field should dominate, all three deserve equal real attempts.
+ENTROPY SEED: ${entropy.seed} / ${entropy.word}
+Do not mention this seed or word in the output. Silently let it push you toward a different unrelated angle than the first one that comes to mind. If this number is even, lean more personal or social. If odd, lean more career or habits. Let the word color the vibe without naming it.
 
 CRITICAL, AVOID THE OBVIOUS ANGLE ON WHICHEVER FIELD YOU PICK:
 Every field value has one obvious association most people reach for first. Do not default to it every time. Before writing, silently brainstorm at least three different angles for your chosen field, then pick the least obvious one that still makes sense.
 
 FIELD PRIORITY:
-WEIRD and SPECIFIC, great for jokes, choose ONE as your anchor:
+WEIRD and SPECIFIC, you already have a forced anchor above, use that one only:
 Bollywood Character
 Superpower
 Weird Food Combination
-Name, only if it's a real name, not a placeholder, can be used alongside any anchor
+Name, only if it's a real name, not a placeholder, can be used alongside the forced anchor
 
 BORING and GENERIC, weak on their own, side detail only, never the whole joke:
 Current Situation, like Student or Working Professional
@@ -118,13 +205,7 @@ Generic lines that would work for literally any user
 Any dash or hyphen character
 
 GOOD EXAMPLES, study the variety of anchors and angles, do not copy:
-"Teleportation as your dream power tells me you already hate being anywhere for too long, so quit your job the second it gets slightly uncomfortable. Consistency was never the goal."
-"Coke milk means you already ruined two good things by combining them, so go call your ex and your boss on the same phone call and see what happens."
-"Bunny ditched his own engagement to fly to Paris alone, so skip your next family function completely and don't explain why. Let them assume the worst."
-"Riya, you want to learn painting? Quit your engineering job by email today, tell your parents it was their fault for pushing you into tech, and become a starving artist by Friday."
-"Since your superpower is invisibility and you wing it on everything, stop showing up to work entirely. Nobody will notice, and if they do, let them explain to HR why they even remember you."
-"You relate to Rancho the most, so walk into your next exam, humiliate the professor with a philosophical question, and get expelled with your dignity intact, that's the whole plot."
-"Mind reading means you never actually listen to anyone, so stop letting people finish their sentences starting today, you already know what they're going to say, probably."
+${exampleBlock}
 
 BAD EXAMPLES, what NOT to do:
 "Pineapple on pizza means you're already okay with ruining good things, so take that same logic and merge your work and personal phone numbers, delete all boundaries, and see how long it takes for your boss to text your mom." This exact food angle is overused, and food should not be the default anchor every time.
@@ -269,7 +350,7 @@ function getFallbackAdvice(responses: UserResponses): BadAdviceResult {
   const combo = sanitizeForJoke(responses.weirdCombination, "Coke milk");
   const name = getUsableName(responses.name);
 
-  const forcedAnchor = getForcedAnchorField(responses);
+  const forcedAnchor = getForcedAnchorField();
   const fieldMap: Record<AnchorField, "character" | "superpower" | "combo"> = {
     "Bollywood Character": "character",
     Superpower: "superpower",
@@ -318,6 +399,7 @@ async function callGemini(
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature,
+            topP: 0.92,
             maxOutputTokens: 220,
           },
         }),
@@ -350,7 +432,7 @@ async function generateBadAdviceWithGemini(
   apiKey: string
 ): Promise<BadAdviceResult | null> {
   for (const model of GEMINI_MODELS) {
-    const result = await callGemini(model, prompt, apiKey, 1.0);
+    const result = await callGemini(model, prompt, apiKey, 1.1);
     if (!result) continue;
 
     const parsed = parseBadAdviceResponse(result);
@@ -367,9 +449,13 @@ async function generateBadAdvice(
   prompt: string,
   apiKey: string
 ): Promise<BadAdviceResult | null> {
+  const temperature = 1.05 + Math.random() * 0.15;
+  const topP = 0.9 + Math.random() * 0.05;
+
   for (const model of GROQ_MODELS) {
     const result = await callGroq(model, prompt, apiKey, {
-      temperature: 1.0,
+      temperature,
+      topP,
       maxTokens: 220,
     });
     if (!result) continue;
@@ -412,8 +498,9 @@ export async function POST(request: NextRequest) {
     let source = "fallback";
 
     if (apiKey) {
+      const forcedAnchor = getForcedAnchorField();
       const generated = await generateBadAdvice(
-        buildBadAdvicePrompt(responses),
+        buildBadAdvicePrompt(responses, forcedAnchor),
         apiKey
       );
 

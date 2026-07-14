@@ -9,10 +9,16 @@ export async function callGroq(
   model: string,
   prompt: string,
   apiKey: string,
-  options: { temperature?: number; maxTokens?: number; timeoutMs?: number } = {}
+  options: {
+    temperature?: number;
+    topP?: number;
+    maxTokens?: number;
+    timeoutMs?: number;
+  } = {}
 ): Promise<string | null> {
   const {
     temperature = 0.8,
+    topP,
     maxTokens = 280,
     timeoutMs = 15000,
   } = options;
@@ -31,6 +37,7 @@ export async function callGroq(
         model,
         messages: [{ role: "user", content: prompt }],
         temperature,
+        ...(typeof topP === "number" ? { top_p: topP } : {}),
         max_tokens: maxTokens,
       }),
       signal: controller.signal,
