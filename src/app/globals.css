@@ -748,7 +748,7 @@ select.input-field {
   position: relative;
   z-index: 1;
   color: rgba(255, 255, 255, 1);
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
   text-align: center;
