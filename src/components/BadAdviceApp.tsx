@@ -37,14 +37,20 @@ export default function BadAdviceApp() {
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
+    const minHold = new Promise<void>((resolve) => {
+      setTimeout(resolve, 1000);
+    });
 
     try {
-      const res = await fetch("/api/advice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userResponses),
-        signal: controller.signal,
-      });
+      const [res] = await Promise.all([
+        fetch("/api/advice", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userResponses),
+          signal: controller.signal,
+        }),
+        minHold,
+      ]);
 
       const data = await res.json();
 
