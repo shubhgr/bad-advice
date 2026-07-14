@@ -76,21 +76,27 @@ export default function BadAdviceApp() {
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
+    const minHold = new Promise<void>((resolve) => {
+      setTimeout(resolve, 2000);
+    });
 
     try {
-      const [goodRes, recRes] = await Promise.all([
-        fetch("/api/good-advice", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ responses, badAdvice: advice }),
-          signal: controller.signal,
-        }),
-        fetch("/api/recommendations", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(responses),
-          signal: controller.signal,
-        }),
+      const [[goodRes, recRes]] = await Promise.all([
+        Promise.all([
+          fetch("/api/good-advice", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ responses, badAdvice: advice }),
+            signal: controller.signal,
+          }),
+          fetch("/api/recommendations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(responses),
+            signal: controller.signal,
+          }),
+        ]),
+        minHold,
       ]);
 
       const data = await goodRes.json();
@@ -131,15 +137,26 @@ export default function BadAdviceApp() {
   const showMovingGradient =
     step === "getting-good-advice" || step === "good-advice";
 
+  const gradientClassName = [
+    "shell-moving-gradient",
+    showMovingGradient ? "is-visible" : "",
+    step === "good-advice" ? "is-good-advice" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <div className="mobile-shell">
-      <div
-        className={`shell-moving-gradient${showMovingGradient ? " is-visible" : ""}`}
-        aria-hidden="true"
-      >
-        <span className="shell-gradient-blob shell-gradient-blob-a" />
-        <span className="shell-gradient-blob shell-gradient-blob-b" />
-        <span className="shell-gradient-blob shell-gradient-blob-c" />
+      <div className={gradientClassName} aria-hidden="true">
+        <span className="shell-gradient-blob-wrap shell-gradient-blob-wrap-a">
+          <span className="shell-gradient-blob shell-gradient-blob-a" />
+        </span>
+        <span className="shell-gradient-blob-wrap shell-gradient-blob-wrap-b">
+          <span className="shell-gradient-blob shell-gradient-blob-b" />
+        </span>
+        <span className="shell-gradient-blob-wrap shell-gradient-blob-wrap-c">
+          <span className="shell-gradient-blob shell-gradient-blob-c" />
+        </span>
         <div className="shell-fluted-glass" />
       </div>
 

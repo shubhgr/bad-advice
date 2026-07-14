@@ -173,75 +173,170 @@ select.input-field {
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  opacity: 0;
   background: #000000;
-  transition: opacity 0.85s ease;
 }
 
-.shell-moving-gradient.is-visible {
+.shell-gradient-blob-wrap {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity 2.8s ease;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+.shell-gradient-blob-wrap-b {
+  right: -10%;
+  top: -8%;
+}
+
+.shell-gradient-blob-wrap-a {
+  left: -12%;
+  top: 18%;
+  transform: translateX(-48vw) scale(0.65);
+}
+
+.shell-moving-gradient.is-visible .shell-gradient-blob-wrap-a {
+  opacity: 0.28;
+  transform: translate(0, 0) scale(1);
+  transition:
+    transform 3.2s cubic-bezier(0.22, 1, 0.36, 1) 0.35s,
+    opacity 2.8s ease 0.35s;
+}
+
+.shell-gradient-blob-wrap-c {
+  left: 35%;
+  bottom: -18%;
+}
+
+.shell-moving-gradient.is-visible .shell-gradient-blob-wrap-b,
+.shell-moving-gradient.is-visible .shell-gradient-blob-wrap-c {
+  opacity: 0;
+}
+
+/* Good advice: brighten first, fade second in */
+.shell-moving-gradient.is-good-advice .shell-gradient-blob-wrap-a {
   opacity: 1;
+  transform: translate(0, 0) scale(1);
+  transition: opacity 2.6s ease 0.15s;
+}
+
+.shell-moving-gradient.is-good-advice .shell-gradient-blob-wrap-b {
+  opacity: 0.85;
+  transition-delay: 0.9s;
+}
+
+.shell-moving-gradient.is-good-advice .shell-gradient-blob-wrap-c {
+  opacity: 0;
 }
 
 .shell-gradient-blob {
-  position: absolute;
+  position: relative;
+  display: block;
   border-radius: 50%;
   filter: blur(90px);
   will-change: transform;
-  animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
-  animation-direction: alternate;
   animation-play-state: paused;
+  animation-timing-function: linear;
+  backface-visibility: hidden;
 }
 
-.shell-moving-gradient.is-visible .shell-gradient-blob {
+.shell-moving-gradient.is-visible .shell-gradient-blob-a,
+.shell-moving-gradient.is-visible .shell-gradient-blob-b {
   animation-play-state: running;
 }
 
 .shell-gradient-blob-a {
   width: min(70vw, 720px);
   height: min(70vw, 720px);
-  left: -12%;
-  top: 18%;
   background: rgba(120, 43, 255, 0.5);
   animation-name: shell-blob-a;
-  animation-duration: 4.2s;
+  animation-duration: 17s;
 }
 
 .shell-gradient-blob-b {
   width: min(58vw, 600px);
   height: min(58vw, 600px);
-  right: -10%;
-  top: -8%;
   background: rgba(98, 28, 230, 0.42);
   animation-name: shell-blob-b;
-  animation-duration: 3.6s;
+  animation-duration: 23s;
+  animation-delay: -7s;
 }
 
 .shell-gradient-blob-c {
   width: min(50vw, 520px);
   height: min(50vw, 520px);
-  left: 35%;
-  bottom: -18%;
   background: rgba(120, 43, 255, 0.28);
   animation-name: shell-blob-c;
-  animation-duration: 5s;
+  animation-duration: 19s;
 }
 
+/* Irregular closed loops — different speeds, directions, and scale */
 @keyframes shell-blob-a {
   0% {
     transform: translate(0, 0) scale(1);
   }
+  18% {
+    transform: translate(34vw, -8vh) scale(1.18);
+  }
+  36% {
+    transform: translate(18vw, 28vh) scale(0.88);
+  }
+  55% {
+    transform: translate(-12vw, 16vh) scale(1.1);
+  }
+  74% {
+    transform: translate(8vw, -18vh) scale(0.94);
+  }
   100% {
-    transform: translate(52vw, 22vh) scale(1.12);
+    transform: translate(0, 0) scale(1);
   }
 }
 
 @keyframes shell-blob-b {
   0% {
-    transform: translate(0, 0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  8% {
+    transform: translate3d(-14vw, 10vh, 0) scale(0.96);
+  }
+  16% {
+    transform: translate3d(-28vw, 22vh, 0) scale(0.9);
+  }
+  24% {
+    transform: translate3d(-20vw, 4vh, 0) scale(1.04);
+  }
+  32% {
+    transform: translate3d(-8vw, -24vh, 0) scale(1.16);
+  }
+  40% {
+    transform: translate3d(12vw, -14vh, 0) scale(1.1);
+  }
+  48% {
+    transform: translate3d(36vw, 6vh, 0) scale(1.04);
+  }
+  56% {
+    transform: translate3d(28vw, 22vh, 0) scale(0.94);
+  }
+  64% {
+    transform: translate3d(14vw, 32vh, 0) scale(0.86);
+  }
+  72% {
+    transform: translate3d(-4vw, 18vh, 0) scale(0.98);
+  }
+  80% {
+    transform: translate3d(-18vw, -6vh, 0) scale(1.12);
+  }
+  88% {
+    transform: translate3d(-8vw, -12vh, 0) scale(1.06);
+  }
+  96% {
+    transform: translate3d(-2vw, -4vh, 0) scale(1.02);
   }
   100% {
-    transform: translate(-48vw, 38vh) scale(1.08);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -249,8 +344,20 @@ select.input-field {
   0% {
     transform: translate(0, 0) scale(1);
   }
+  20% {
+    transform: translate(22vw, -28vh) scale(1.2);
+  }
+  40% {
+    transform: translate(-30vw, -10vh) scale(0.84);
+  }
+  60% {
+    transform: translate(-6vw, 26vh) scale(1.08);
+  }
+  80% {
+    transform: translate(30vw, 14vh) scale(0.92);
+  }
   100% {
-    transform: translate(-28vw, -32vh) scale(1.15);
+    transform: translate(0, 0) scale(1);
   }
 }
 
@@ -259,11 +366,22 @@ select.input-field {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.2;
+  opacity: 0;
   background-image: url("/images/fluted-glass.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
+  transition: opacity 2.8s ease;
+}
+
+.shell-moving-gradient.is-visible .shell-fluted-glass {
+  opacity: 0.2;
+  transition-delay: 1.6s;
+}
+
+.shell-moving-gradient.is-good-advice .shell-fluted-glass {
+  opacity: 0.2;
+  transition-delay: 0s;
 }
 
 .mobile-shell:has(.shell-moving-gradient.is-visible) {
@@ -550,8 +668,18 @@ select.input-field {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .shell-moving-gradient {
-    transition: opacity 0.3s ease;
+  .shell-gradient-blob-wrap {
+    transition: opacity 0.4s ease;
+    transform: none !important;
+  }
+
+  .shell-moving-gradient.is-visible .shell-gradient-blob-wrap-a,
+  .shell-moving-gradient.is-good-advice .shell-gradient-blob-wrap-b {
+    transition-delay: 0s;
+  }
+
+  .shell-fluted-glass {
+    transition: opacity 0.4s ease 0.2s;
   }
 
   .shell-gradient-blob {
@@ -1466,12 +1594,47 @@ select.input-field {
 }
 
 .animate-advice-in {
-  animation: advice-screen-in 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: advice-screen-in 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes getting-advice-visual-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes getting-advice-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.getting-advice-screen.animate-advice-in .getting-advice-visual {
+  animation: getting-advice-visual-in 1.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.getting-advice-screen.animate-advice-in .getting-advice-message {
+  animation: getting-advice-message-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-advice-in {
     animation: fade-in 0.3s ease-out;
+  }
+
+  .getting-advice-screen.animate-advice-in .getting-advice-visual,
+  .getting-advice-screen.animate-advice-in .getting-advice-message {
+    animation: fade-in 0.3s ease-out both;
   }
 }
 
