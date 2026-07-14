@@ -348,8 +348,11 @@ You MUST build the entire joke around this exact field and this exact user value
 ENTROPY SEED: ${entropy.seed} / ${entropy.word}
 Do not mention this seed or word in the output. Silently let it push you toward a different unrelated angle than the first one that comes to mind within the forced anchor field. If this number is even, lean more personal or social. If odd, lean more career or habits. Let the word color the vibe without naming it.
 
+CRITICAL, DO NOT ECHO THE EXAMPLES BELOW, EVEN REWORDED:
+The good examples below exist to show you the STYLE and STRUCTURE of a joke for this value, not the specific content to reuse. If any example below mentions a specific target, action, or relationship, like an ex, a boss, a parent, a phone call, a specific place, or a specific object, you must NOT reuse that same target or action in your output, even with different wording. Reusing the same real world target with new phrasing is still a copy, not a new joke. If your first instinct matches the shape of an example below, that is a signal to think of a completely different target and action, not a signal you're on the right track. Your joke must be recognizably different in content from every example shown, not just in sentence structure.
+
 CRITICAL, AVOID THE OBVIOUS ANGLE ON THE FORCED ANCHOR:
-Every field value has one obvious association most people reach for first. Do not default to it every time. Before writing, silently brainstorm at least three different angles for ${userValue}, then pick the least obvious one that still makes sense.
+Every field value has one obvious association most people reach for first, and often one example below represents that obvious angle. Do not default to it. Before writing, silently brainstorm at least four different angles for ${userValue}, actively including angles NOT represented in the examples below, then pick one of those instead of the closest match to an example.
 
 FIELD PRIORITY:
 Your only allowed weird field this call is: ${forcedAnchor} (${userValue})
@@ -369,14 +372,14 @@ This is a mechanical formula, not a joke, and it is also a sign you are blending
 IT MUST BE ADVICE WITH TEETH, NOT A GENTLE OBSERVATION:
 Every output must sound like you are personally, aggressively instructing the user to do something specific and reckless, using direct commands: "go do X," "quit X and do Y," "burn X," "delete X," "cut off Y," "never speak to Z again." It must NOT be phrased softly as "you can now..." or end on something cozy or whimsical.
 
-HOW TO WRITE THE JOKE, using ${forcedAnchor} / ${userValue} only, and a non-obvious angle for it:
+HOW TO WRITE THE JOKE, using ${forcedAnchor} / ${userValue} only, and a non-obvious angle for it, distinct from the target and action used in the examples below:
 ${structure.instruction}
 
 ${anchorGuidance}
 
-Name a SPECIFIC detail from their actual answer for ${forcedAnchor}, especially "${userValue}", a real word or phrase they gave, not a paraphrase of the question.
+Name a SPECIFIC detail from their actual answer for ${forcedAnchor}, especially "${userValue}", a real word or phrase they gave, not a paraphrase of the question. This specific detail is the only thing that should overlap with the examples below, the target, action, and joke content must be your own.
 
-VOICE: A brutally honest friend or older sibling clowning them hard, zero filter, then confidently telling them exactly what reckless thing to do next. Should sting first, land funny second. Should NOT sound cute, whimsical, or like it was assembled from a checklist of fields. Should NOT sound like the same joke you wrote last time for this same field value.
+VOICE: A brutally honest friend or older sibling clowning them hard, zero filter, then confidently telling them exactly what reckless thing to do next. Should sting first, land funny second. Should NOT sound cute, whimsical, or like it was assembled from a checklist of fields. Should NOT sound like the same joke you wrote last time for this same field value, and should NOT sound like a reworded version of any example shown below.
 
 STRICT RULES:
 1. Start with their name if present and not a placeholder like "friend," "user," or random letters. If no valid name, skip straight into the joke with zero direct address.
@@ -384,12 +387,15 @@ STRICT RULES:
 3. Do not use the dash or hyphen character anywhere in the output. Use commas or periods instead.
 4. Must end on a real, reckless direct command, not a whimsical or cozy suggestion.
 5. 1 to 2 emojis max, only if it actually lands, most jokes need zero.
-6. Output ONLY the joke in the "advice" field. No quotes around it, no markdown, no preamble, no meta commentary.
+6. The specific real world target and action in your command (who or what they are told to do something to or with) must be different from the target and action in every good example shown below.
+7. Output ONLY the joke in the "advice" field. No quotes around it, no markdown, no preamble, no meta commentary.
 
 BANNED PHRASING:
 ${bannedPhrasing}
 
-GOOD EXAMPLES, all for ${forcedAnchor} and matched to ${userValue} when possible, study the angles, do not copy:
+Also treat any target or action that appears in the good examples below as effectively banned for this call, do not write a version of it with different words.
+
+GOOD EXAMPLES, all for ${forcedAnchor} and matched to ${userValue} when possible, study the ANGLE and STRUCTURE only, do not reuse the target, action, or premise:
 ${exampleBlock}
 
 BAD EXAMPLES for this ${forcedAnchor} call, what NOT to do:
