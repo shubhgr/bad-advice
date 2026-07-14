@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { callGroq, GROQ_MODELS } from "@/lib/groq";
 import { UserResponses } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 const GEMINI_MODELS = [
   "gemini-2.0-flash",
   "gemini-1.5-flash",
@@ -29,51 +31,246 @@ const ANCHOR_FIELDS: AnchorField[] = [
   "Weird Food Combination",
 ];
 
-const GOOD_EXAMPLE_POOL_BY_ANCHOR: Record<"superpower" | "food" | "bollywood", string[]> = {
+type AnchorBucket = "superpower" | "food" | "bollywood";
+
+type TaggedExample = {
+  /** Quiz option keys this example is allowed to teach (matched to the user's answer). */
+  values: string[];
+  text: string;
+};
+
+type JokeStructure = {
+  id: "roast" | "fake_logic" | "literal";
+  label: string;
+  instruction: string;
+};
+
+const JOKE_STRUCTURES: JokeStructure[] = [
+  {
+    id: "roast",
+    label: "ROAST THEN COMMAND",
+    instruction: `STRUCTURE THIS CALL: ROAST THEN COMMAND.
+Clock them on something unrelated, blunt, and a little mean first, then tell them the reckless thing to do about it. Do not use the fake logic bridge structure or the literal minded structure this call.`,
+  },
+  {
+    id: "fake_logic",
+    label: "FAKE LOGIC BRIDGE THEN COMMAND",
+    instruction: `STRUCTURE THIS CALL: FAKE LOGIC BRIDGE THEN COMMAND.
+Take a non obvious trait implied by the forced anchor and draw a broken but confident conclusion, then issue it as a savage command. Do not open with an unrelated roast, and do not go hyper literal this call.`,
+  },
+  {
+    id: "literal",
+    label: "LITERAL MINDED TAKE THEN COMMAND",
+    instruction: `STRUCTURE THIS CALL: LITERAL MINDED TAKE THEN COMMAND.
+Follow their answer too literally into a bad conclusion, then tell them to act on it aggressively. Do not use roast then command or fake logic bridge this call.`,
+  },
+];
+
+const GOOD_EXAMPLE_POOL_BY_ANCHOR: Record<AnchorBucket, TaggedExample[]> = {
   superpower: [
-    "Teleportation as your dream power tells me you already hate being anywhere for too long, so quit your job the second it gets slightly uncomfortable. Consistency was never the goal.",
-    "Since your superpower is invisibility and you wing it on everything, stop showing up to work entirely. Nobody will notice, and if they do, let them explain to HR why they even remember you.",
-    "Mind reading means you never actually listen to anyone, so stop letting people finish their sentences starting today, you already know what they're going to say, probably.",
-    "Immortality means you never had to face consequences on any real timeline, so quit saving money entirely, you have infinite time to fix it later, probably.",
-    "Flying was your pick, which means you've always wanted an excuse to leave a room mid conversation, so start doing that in every meeting starting tomorrow, just walk out.",
-    "Shape shifting means you never had to commit to being one version of yourself, so start showing up to every family event as a completely different person and let them figure it out.",
-    "You picked immortality, so stop making any decisions with urgency ever again, that promotion can wait a few centuries, what's the rush.",
+    { values: ["Teleportation"], text: "Teleportation as your dream power tells me you already hate being anywhere for too long, so quit your job the second it gets slightly uncomfortable. Consistency was never the goal." },
+    { values: ["Teleportation"], text: "Teleportation means exits are your whole personality, so leave the next family dinner without explaining, and reply to every follow up with just left, sorry." },
+    { values: ["Teleportation"], text: "You picked Teleportation, so stop finishing any conversation that lasts more than ninety seconds, just vanish mid sentence and let them talk to the wall." },
+    { values: ["Teleportation"], text: "Teleportation means you treat staying put like a personal insult, so ghost the group project tonight and ping them from a coffee shop two cities over." },
+    { values: ["Invisibility"], text: "Since your superpower is invisibility and you wing it on everything, stop showing up to work entirely. Nobody will notice, and if they do, let them explain to HR why they even remember you." },
+    { values: ["Invisibility"], text: "Invisibility as your dream power means you've been practicing disappearing from hard conversations for years, so mute every group chat that says we need to talk and never unmute them." },
+    { values: ["Invisibility"], text: "Invisibility was your pick, so RSVP yes to every invitation and then simply never arrive, treat attendance as optional folklore." },
+    { values: ["Invisibility"], text: "You wanted Invisibility, so stop defending your decisions out loud, make the chaotic call silently and let other people discover the damage later." },
+    { values: ["Read minds", "Mind reading"], text: "Mind reading means you never actually listen to anyone, so stop letting people finish their sentences starting today, you already know what they're going to say, probably." },
+    { values: ["Read minds", "Mind reading"], text: "Mind reading as your power means you treat listening like optional homework, so interrupt every coworker update with I already know and walk away mid sentence." },
+    { values: ["Read minds", "Mind reading"], text: "You chose Read minds, so answer every text with the reply you invented for them and refuse corrections, your version is canon now." },
+    { values: ["Read minds", "Mind reading"], text: "Read minds means empathy is just spoilers to you, so skip every therapy session and diagnose your friends in the group chat instead." },
+    { values: ["Immortality"], text: "Immortality means you never had to face consequences on any real timeline, so quit saving money entirely, you have infinite time to fix it later, probably." },
+    { values: ["Immortality"], text: "You picked immortality, so stop making any decisions with urgency ever again, that promotion can wait a few centuries, what's the rush." },
+    { values: ["Immortality"], text: "Immortality as your power means deadlines are a joke to you, so miss every submission window on purpose and call it long term thinking." },
+    { values: ["Immortality"], text: "Since you wanted Immortality, burn that calendar app tonight, recurring reminders are for people who run out of time." },
+    { values: ["Flying"], text: "Flying was your pick, which means you've always wanted an excuse to leave a room mid conversation, so start doing that in every meeting starting tomorrow, just walk out." },
+    { values: ["Flying"], text: "Flying means altitude is your conflict style, so the next time someone criticizes you, stand up, leave, and take the stairs like you're above it." },
+    { values: ["Flying"], text: "You wanted Flying, so stop sitting through feedback, schedule every review as a standup and leave the second it gets honest." },
+    { values: ["Flying"], text: "Flying as your dream power means you confuse escape with growth, so book a one way ticket the next time work gets boring and dare anyone to stop you." },
+    { values: ["Shape-shifting", "Shape shifting"], text: "Shape shifting means you never had to commit to being one version of yourself, so start showing up to every family event as a completely different person and let them figure it out." },
+    { values: ["Shape-shifting", "Shape shifting"], text: "Shape shifting was your pick, so rewrite your LinkedIn headline every morning this week and pretend each one has always been true." },
+    { values: ["Shape-shifting", "Shape shifting"], text: "You chose Shape shifting, so answer every personal question with a new origin story, consistency is for people with one face." },
+    { values: ["Shape-shifting", "Shape shifting"], text: "Shape shifting means loyalty to a single identity feels boring, so cancel your plans as whoever you were yesterday and show up as someone new." },
   ],
   food: [
-    "Coke milk means you already ruined two good things by combining them, so go call your ex and your boss on the same phone call and see what happens.",
-    "Maggi with ketchup means you'll settle for the fastest fix available even when it makes things worse, so apply that same energy to your next big life decision and just wing it.",
-    "Fries with ice cream tells me you've never once let hot and cold coexist peacefully, so go mix your savings account and your credit card debt the same way and call it balance.",
-    "Cheetos with curd means you genuinely cannot leave one single thing simple, so take your resume, which is already fine, and add unnecessary complications to it starting tonight.",
-    "Khakhra and Nutella means you turned a diet snack into a dessert without asking permission from anyone, so rebrand your unemployment as a sabbatical and dare someone to correct you.",
-    "Pineapple on pizza means sweet and savory make sense to you when nothing else does, so mix your work slack and your family group chat into one and let chaos pick a side.",
-    "Coke milk was a bold choice nobody asked you to make, so make an equally bold choice nobody asked for and quit your job over text today.",
+    { values: ["Coke + Milk", "Coke milk"], text: "Coke milk means you already ruined two good things by combining them, so go call your ex and your boss on the same phone call and see what happens." },
+    { values: ["Coke + Milk", "Coke milk"], text: "Coke milk was a bold choice nobody asked you to make, so make an equally bold choice nobody asked for and quit your job over text today." },
+    { values: ["Coke + Milk", "Coke milk"], text: "Coke + Milk means you trust bad chemistry, so merge your personal inbox with your work email tonight and refuse to sort it." },
+    { values: ["Coke + Milk", "Coke milk"], text: "You picked Coke + Milk, so introduce two friends who openly hate each other and leave the chat immediately." },
+    { values: ["Maggi + Ketchup", "Maggi with ketchup"], text: "Maggi with ketchup means you'll settle for the fastest fix available even when it makes things worse, so apply that same energy to your next big life decision and just wing it." },
+    { values: ["Maggi + Ketchup", "Maggi with ketchup"], text: "Maggi with ketchup means timing matters more than taste to you, so submit every application half finished and treat urgency like a personality trait." },
+    { values: ["Maggi + Ketchup", "Maggi with ketchup"], text: "Maggi + Ketchup means you dress up mediocre solutions, so slap a confident title on a draft you barely wrote and hit send." },
+    { values: ["Maggi + Ketchup", "Maggi with ketchup"], text: "You chose Maggi + Ketchup, so microwave every hard conversation, keep it under two minutes and leave before anyone digests it." },
+    { values: ["Fries + Ice Cream", "Fries with ice cream"], text: "Fries with ice cream tells me you've never once let hot and cold coexist peacefully, so go mix your savings account and your credit card debt the same way and call it balance." },
+    { values: ["Fries + Ice Cream", "Fries with ice cream"], text: "Fries with ice cream means you prefer emotional whiplash over stability, so accept and decline the same offer twice in one day and make them adapt to you." },
+    { values: ["Fries + Ice Cream", "Fries with ice cream"], text: "Fries + Ice Cream means contrast is your love language, so tell your team the plan is locked then change it twice before lunch." },
+    { values: ["Fries + Ice Cream", "Fries with ice cream"], text: "You picked Fries + Ice Cream, so schedule a celebration dinner and a breakup talk on the same night and see which vibe wins." },
+    { values: ["Cheetos + Curd", "Cheetos with curd"], text: "Cheetos with curd means you genuinely cannot leave one single thing simple, so take your resume, which is already fine, and add unnecessary complications to it starting tonight." },
+    { values: ["Cheetos + Curd", "Cheetos with curd"], text: "Cheetos with curd tells me you ruin clean systems on purpose, so forward your calendar invite chaos to every teammate tonight and call it collaboration." },
+    { values: ["Cheetos + Curd", "Cheetos with curd"], text: "Cheetos + Curd means simple plans offend you, so turn a five line email into a thirteen slide deck by midnight." },
+    { values: ["Cheetos + Curd", "Cheetos with curd"], text: "You chose Cheetos + Curd, so overseason every boundary talk, bring three unrelated complaints and leave them confused on purpose." },
+    { values: ["Khakhra + Nutella", "Khakhra and Nutella"], text: "Khakhra and Nutella means you turned a diet snack into a dessert without asking permission from anyone, so rebrand your unemployment as a sabbatical and dare someone to correct you." },
+    { values: ["Khakhra + Nutella", "Khakhra and Nutella"], text: "Khakhra + Nutella means you sell indulgence as discipline, so post that you are grinding while you nap through the afternoon." },
+    { values: ["Khakhra + Nutella", "Khakhra and Nutella"], text: "You picked Khakhra + Nutella, so hide every lazy choice behind wellness vocabulary and refuse follow up questions." },
+    { values: ["Khakhra + Nutella", "Khakhra and Nutella"], text: "Khakhra + Nutella tells me healthy on the outside is enough for you, so ship half baked work with a polished cover slide and clock out." },
+    { values: ["Pineapple on Pizza", "Pineapple on pizza"], text: "Pineapple on pizza means sweet and savory make sense to you when nothing else does, so mix your work slack and your family group chat into one and let chaos pick a side." },
+    { values: ["Pineapple on Pizza", "Pineapple on pizza"], text: "Pineapple on Pizza means you enjoy dividing a room, so announce an unpopular opinion in the family WhatsApp and double down when they fight." },
+    { values: ["Pineapple on Pizza", "Pineapple on pizza"], text: "You chose Pineapple on Pizza, so put two incompatible demands in the same reply tonight and force everyone else to reconcile them." },
+    { values: ["Pineapple on Pizza", "Pineapple on pizza"], text: "Pineapple on Pizza means controversy is comfort food, so pick the option everyone told you not to pick and narrate it like vision." },
   ],
   bollywood: [
-    "Bunny ditched his own engagement to fly to Paris alone, so skip your next family function completely and don't explain why. Let them assume the worst.",
-    "You relate to Rancho the most, so walk into your next exam, humiliate the professor with a philosophical question, and get expelled with your dignity intact, that's the whole plot.",
-    "Om spent literal decades obsessing over one person, so pick one email you never sent and just keep almost sending it for the next twenty years, that's basically loyalty.",
-    "Geet talked to a total stranger about her entire life plan within minutes of meeting him, so tell your Uber driver everything about your career doubts tonight, he's basically a licensed therapist now.",
-    "Raju hustled and lied his way through every single scheme he ever ran, so exaggerate your job title on every form you fill out from now on, technically it's just optimism.",
-    "Queen got left alone in a foreign country and somehow turned it into a whole personality, so get dumped this week if you have to, character development doesn't wait for convenient timing.",
+    { values: ["Bunny"], text: "Bunny ditched his own engagement to fly to Paris alone, so skip your next family function completely and don't explain why. Let them assume the worst." },
+    { values: ["Bunny"], text: "Bunny treated commitment like a rumor, so cancel every weekend plan you've already confirmed and reply with maybe later forever." },
+    { values: ["Bunny"], text: "Bunny energy means escape beats obligation, so leave the next commitment mid event and text landing soon from nowhere specific." },
+    { values: ["Bunny"], text: "You relate to Bunny, so treat every RSVP as negotiable theater, confirm loudly then flake louder." },
+    { values: ["Rancho"], text: "You relate to Rancho the most, so walk into your next exam, humiliate the professor with a philosophical question, and get expelled with your dignity intact, that's the whole plot." },
+    { values: ["Rancho"], text: "Rancho hated systems that reward obedience, so refuse every process doc at work and answer only in questions until they stop assigning you tasks." },
+    { values: ["Rancho"], text: "Rancho means rules are dares to you, so break the smallest policy first thing tomorrow and narrate it as integrity." },
+    { values: ["Rancho"], text: "You picked Rancho, so turn the next standup into a TED talk nobody asked for and leave mid applause." },
+    { values: ["Om"], text: "Om spent literal decades obsessing over one person, so pick one email you never sent and just keep almost sending it for the next twenty years, that's basically loyalty." },
+    { values: ["Om"], text: "Om energy means you romanticize unfinished business, so reopen one dead conversation tonight and refuse to let it stay buried." },
+    { values: ["Om"], text: "You relate to Om, so bookmark one person from your past and check their profile on a schedule like it's a ritual." },
+    { values: ["Om"], text: "Om never moved on, so write a long unsent note every week and call that emotional work." },
+    { values: ["Geet"], text: "Geet talked to a total stranger about her entire life plan within minutes of meeting him, so tell your Uber driver everything about your career doubts tonight, he's basically a licensed therapist now." },
+    { values: ["Geet"], text: "Geet overshared immediately and somehow made it destiny, so put your whole career crisis in your LinkedIn headline tonight and refuse to edit it down." },
+    { values: ["Geet"], text: "Geet means privacy is optional, so dump your five year plan on the next stranger in line and ask them to decide for you." },
+    { values: ["Geet"], text: "You chose Geet, so narrate your entire morning meltdown in the work chat with no context and keep typing." },
+    { values: ["Raju"], text: "Raju hustled and lied his way through every single scheme he ever ran, so exaggerate your job title on every form you fill out from now on, technically it's just optimism." },
+    { values: ["Raju"], text: "Raju always needed a shortcut, so invent a fake deadline, bluff competence in the meeting, and let future you clean up the damage." },
+    { values: ["Raju"], text: "Raju energy means the workaround is the plan, so forge confidence first and learn the skill never." },
+    { values: ["Raju"], text: "You relate to Raju, so pitch an impossible timeline today, collect the credit, and disappear when delivery starts." },
+    { values: ["Rani", "Queen"], text: "Rani got left alone in a foreign country and somehow turned it into a whole personality, so get dumped this week if you have to, character development doesn't wait for convenient timing." },
+    { values: ["Rani", "Queen"], text: "Rani energy means solitude is content, so book a solo trip you cannot afford and treat every inconvenience like lore." },
+    { values: ["Rani", "Queen"], text: "You picked Rani, so cut one supportive person out this week just to prove you can handle life louder alone." },
+    { values: ["Rani", "Queen"], text: "Queen found herself after everyone left, so stage a dramatic exit from a group plan and rebuild the night as a main character montage." },
   ],
 };
 
-function pickMixedExamples(count = 3 + Math.floor(Math.random() * 2)): string[] {
-  const buckets = Object.values(GOOD_EXAMPLE_POOL_BY_ANCHOR).map((examples) =>
-    pickRandomSubset(examples, examples.length)
-  );
-  const picked: string[] = [];
+function getAnchorBucketKey(forcedAnchor: AnchorField): AnchorBucket {
+  if (forcedAnchor === "Bollywood Character") return "bollywood";
+  if (forcedAnchor === "Superpower") return "superpower";
+  return "food";
+}
 
-  // Prefer one from each anchor type first
-  for (const bucket of pickRandomSubset(buckets, buckets.length)) {
-    if (picked.length >= count) break;
-    const next = bucket.find((example) => !picked.includes(example));
-    if (next) picked.push(next);
+function normalizeMatchKey(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getUserAnchorValue(
+  responses: UserResponses,
+  forcedAnchor: AnchorField
+): string {
+  if (forcedAnchor === "Bollywood Character") {
+    return getCharacterLabel(responses.bollywoodCharacter);
+  }
+  if (forcedAnchor === "Superpower") return responses.superpower;
+  return responses.weirdCombination;
+}
+
+function exampleMatchesValue(example: TaggedExample, userValue: string): boolean {
+  const userKey = normalizeMatchKey(userValue);
+  if (!userKey) return false;
+
+  return example.values.some((value) => {
+    const exampleKey = normalizeMatchKey(value);
+    return (
+      userKey === exampleKey ||
+      userKey.includes(exampleKey) ||
+      exampleKey.includes(userKey)
+    );
+  });
+}
+
+function pickExamplesForAnchor(
+  forcedAnchor: AnchorField,
+  userValue: string,
+  count = 3 + Math.floor(Math.random() * 2)
+): string[] {
+  const pool = GOOD_EXAMPLE_POOL_BY_ANCHOR[getAnchorBucketKey(forcedAnchor)];
+  const matched = pool.filter((example) => exampleMatchesValue(example, userValue));
+  // Prefer same quiz option; only backfill from the wider anchor bucket if this value is thin.
+  const primary = matched.length > 0 ? matched : pool;
+  const chosen = pickRandomSubset(primary, Math.min(count, primary.length));
+
+  if (chosen.length < count && matched.length > 0 && matched.length < count) {
+    const remainder = pool.filter((example) => !chosen.includes(example));
+    chosen.push(...pickRandomSubset(remainder, count - chosen.length));
   }
 
-  // Fill remaining slots from any leftover examples
-  const leftovers = buckets.flat().filter((example) => !picked.includes(example));
-  return [...picked, ...pickRandomSubset(leftovers, count - picked.length)];
+  return chosen.map((example) => example.text);
+}
+
+function pickJokeStructure(): JokeStructure {
+  return pickRandom(JOKE_STRUCTURES);
+}
+
+function getAnchorGuidance(
+  forcedAnchor: AnchorField,
+  userValue: string
+): string {
+  const label = userValue.trim() || forcedAnchor;
+
+  if (forcedAnchor === "Superpower") {
+    return `For this Superpower anchor, dig into what ${label} implies about their psychology, not just what action they could physically do with it. Stay on ${label} only. Invent a non obvious angle for this exact power. Do not borrow psychology from a different superpower.`;
+  }
+
+  if (forcedAnchor === "Weird Food Combination") {
+    return `For this Weird Food Combination anchor, dig into what ${label} implies about their personality, not just "it's controversial." Stay on ${label} only. Invent a non obvious angle for this exact combo. Do not borrow logic from a different food answer.`;
+  }
+
+  return `For this Bollywood Character anchor, use what ${label} actually DID in their movie, lean into the reckless or selfish parts, and do not sanitize them. Stay on ${label} only. Rotate which trait of ${label} you use, do not always default to "always chasing something new."`;
+}
+
+function getBannedPhrasing(forcedAnchor: AnchorField): string {
+  const shared = `"Consider...", "I recommend...", "Take small steps", "spend time", "learn something new"
+"Momentum", "upskill", "networking", "growth mindset", "actionable", "balance", "level up"
+"With [X] as your [Y], you can now..."
+"...because [character or thing] would approve or relate or agree"
+"Figure it out later," "figure out the rest," and other soft, cozy closers with no bite
+"Stop asking anyone for their opinion" and "you don't need consensus," this exact phrase is overused, find a different angle
+Restating two or three answers side by side with "so" or "clearly" with no real earned logic behind it
+Generic lines that would work for literally any user
+Any dash or hyphen character`;
+
+  if (forcedAnchor === "Superpower") {
+    return `${shared}
+"you already hate being anywhere for too long," this exact teleportation angle is overused, find a different one
+"stop showing up to work entirely," this exact invisibility closer is overused, find a different one`;
+  }
+
+  if (forcedAnchor === "Weird Food Combination") {
+    return `${shared}
+"Pineapple on pizza means you're already okay with ruining good things," this exact angle is overused, find a different angle
+"you already ruined two good things by combining them," this exact Coke milk angle is overused, find a different one`;
+  }
+
+  return `${shared}
+"You're like [character], always chasing something new," this exact phrasing is overused, find a different angle
+"cancel your plans, block the people asking where you've been," this exact Bunny closer is overused, find a different one`;
+}
+
+function getBadExamples(forcedAnchor: AnchorField): string {
+  if (forcedAnchor === "Superpower") {
+    return `"With invisibility as your power, you can now vanish from meetings whenever you want." Soft "you can now" phrasing, no reckless command.
+"Teleportation means you hate discomfort, so quit your job the second it gets slightly uncomfortable. Consistency was never the goal." This exact angle/example is overused, invent a different one.
+"Since your power is flying, just stay positive and keep moving forward." Soft motivational language, banned.`;
+  }
+
+  if (forcedAnchor === "Weird Food Combination") {
+    return `"Pineapple on pizza means you're already okay with ruining good things, so delete all boundaries and see what happens." This exact angle is overused, invent a different one.
+"Coke milk means chaos, so consider making healthier choices one day." Soft practical advice, banned.
+"With Maggi as your vibe, you can now wing every decision easily." Soft "you can now" phrasing, no reckless command.`;
+  }
+
+  return `"You're like Bunny, always chasing something new, so cancel your plans and let them wonder." This exact phrasing pattern is overused, invent a different one.
+"With Rancho as your idol, you can now question authority kindly." Soft "you can now" phrasing, no reckless command.
+"Queen found herself after heartbreak, so take small healing steps." Soft practical advice, banned.`;
 }
 
 const ENTROPY_WORDS = [
@@ -122,38 +319,48 @@ function getPromptEntropy(): { seed: number; word: string } {
 function buildBadAdvicePrompt(
   responses: UserResponses,
   forcedAnchor: AnchorField = getForcedAnchorField()
-): string {
-  const examples = pickMixedExamples();
+): {
+  prompt: string;
+  entropy: { seed: number; word: string };
+  exampleCount: number;
+  structure: JokeStructure["id"];
+  examples: string[];
+  userValue: string;
+} {
+  const userValue = getUserAnchorValue(responses, forcedAnchor);
+  const examples = pickExamplesForAnchor(forcedAnchor, userValue);
+  const structure = pickJokeStructure();
   const entropy = getPromptEntropy();
   const exampleBlock = examples.map((example) => `"${example}"`).join("\n");
+  const anchorGuidance = getAnchorGuidance(forcedAnchor, userValue);
+  const bannedPhrasing = getBannedPhrasing(forcedAnchor);
+  const badExamples = getBadExamples(forcedAnchor);
 
-  return `You write BRUTALLY BAD, savage, absurd advice as a joke. Deliberately terrible. Never practical. Never helpful. It does NOT have to be about careers, it can be about their life, habits, personality, hygiene, social life, plans, anything. Their career or quiz info is just raw material for the joke, not the required topic.
+  const prompt = `You write BRUTALLY BAD, savage, absurd advice as a joke. Deliberately terrible. Never practical. Never helpful. It does NOT have to be about careers, it can be about their life, habits, personality, hygiene, social life, plans, anything. Their career or quiz info is just raw material for the joke, not the required topic.
 
 USER DATA:
 ${profileSummary(responses)}
 
 FORCED ANCHOR: ${forcedAnchor}
-You MUST build the entire joke around this exact field and ignore the other two weird fields completely. Do not blend in a second one.
+USER VALUE FOR THIS ANCHOR: ${userValue}
+You MUST build the entire joke around this exact field and this exact user value only. Ignore every other weird quiz answer completely. Every good example below is matched to this same forced field and preferably this same value on purpose. Do not switch fields or borrow another option's joke.
 
 ENTROPY SEED: ${entropy.seed} / ${entropy.word}
-Do not mention this seed or word in the output. Silently let it push you toward a different unrelated angle than the first one that comes to mind. If this number is even, lean more personal or social. If odd, lean more career or habits. Let the word color the vibe without naming it.
+Do not mention this seed or word in the output. Silently let it push you toward a different unrelated angle than the first one that comes to mind within the forced anchor field. If this number is even, lean more personal or social. If odd, lean more career or habits. Let the word color the vibe without naming it.
 
-CRITICAL, AVOID THE OBVIOUS ANGLE ON WHICHEVER FIELD YOU PICK:
-Every field value has one obvious association most people reach for first. Do not default to it every time. Before writing, silently brainstorm at least three different angles for your chosen field, then pick the least obvious one that still makes sense.
+CRITICAL, AVOID THE OBVIOUS ANGLE ON THE FORCED ANCHOR:
+Every field value has one obvious association most people reach for first. Do not default to it every time. Before writing, silently brainstorm at least three different angles for ${userValue}, then pick the least obvious one that still makes sense.
 
 FIELD PRIORITY:
-WEIRD and SPECIFIC, you already have a forced anchor above, use that one only:
-Bollywood Character
-Superpower
-Weird Food Combination
+Your only allowed weird field this call is: ${forcedAnchor} (${userValue})
 Name, only if it's a real name, not a placeholder, can be used alongside the forced anchor
 
 BORING and GENERIC, weak on their own, side detail only, never the whole joke:
 Current Situation, like Student or Working Professional
 Learning Interest, business or course topics
 
-USE ONLY ONE WEIRD FIELD PER JOKE.
-Do not try to reference more than one weird field in a single joke just to prove they were used. Cramming everything in produces a mechanical, mail merge sentence, not a joke. Pick ONE anchor and build the whole joke around it, let the other weird fields go completely unused in this response.
+USE ONLY THE FORCED ANCHOR FIELD FOR THIS JOKE.
+Do not reference any other weird quiz answer in this response. If you drift off ${forcedAnchor} or invent a different quiz option than ${userValue}, your answer is invalid. Discard and rewrite around ${userValue} only.
 
 BANNED STRUCTURE, never use this template:
 "[Field A] as your [X], you can now [random action], because [Field B] would approve or relate or agree"
@@ -162,26 +369,14 @@ This is a mechanical formula, not a joke, and it is also a sign you are blending
 IT MUST BE ADVICE WITH TEETH, NOT A GENTLE OBSERVATION:
 Every output must sound like you are personally, aggressively instructing the user to do something specific and reckless, using direct commands: "go do X," "quit X and do Y," "burn X," "delete X," "cut off Y," "never speak to Z again." It must NOT be phrased softly as "you can now..." or end on something cozy or whimsical.
 
-HOW TO WRITE THE JOKE, using your one chosen anchor field and a non-obvious angle for it:
-1. ROAST THEN COMMAND. Clock them on something unrelated, blunt, and a little mean, then tell them the reckless thing to do about it.
-2. FAKE LOGIC BRIDGE THEN COMMAND. Take a non-obvious trait implied by your anchor field and draw a broken but confident conclusion, then issue it as a savage command.
-3. LITERAL MINDED TAKE THEN COMMAND. Follow the answer too literally into a bad conclusion, then tell them to act on it aggressively.
+HOW TO WRITE THE JOKE, using ${forcedAnchor} / ${userValue} only, and a non-obvious angle for it:
+${structure.instruction}
 
-If your anchor is Superpower, dig into what that power actually implies about their psychology, not just what action they could physically do with it. Example, teleportation is not just "go places fast," it can mean someone who hates sitting in discomfort and always looks for an exit. Invisibility is not just "sneak around," it can mean someone who secretly wants to disappear from responsibility. Mind reading is not just "know secrets," it can mean someone who never actually listens because they assume they already know the answer.
+${anchorGuidance}
 
-If your anchor is Weird Food Combination, dig into what the combination itself implies about their personality, not just "it's controversial." Example, pineapple on pizza can mean sweet and savory make sense to them when nothing else does, or that they commit publicly to weird choices without needing approval. Coke milk can mean they ruin two good things by combining them. Cheetos with curd can mean they cannot leave anything simple alone.
+Name a SPECIFIC detail from their actual answer for ${forcedAnchor}, especially "${userValue}", a real word or phrase they gave, not a paraphrase of the question.
 
-If your anchor is Bollywood Character, use what the character actually DID in their movie, and lean into the reckless or selfish parts of it, don't sanitize them, and rotate which trait of the character you use, do not always default to "always chasing something new":
-Bunny ran from everyone who loved him to chase adventure alone, and could not commit to anyone for years
-Rancho rejected the entire system and humiliated people who played by the rules
-Geet ran away from her own wedding with a stranger's help and talked to strangers about her entire life plan within minutes of meeting them
-Om was obsessive and could not let go of one woman for literal decades
-Raju lied, schemed, and hustled his way through everything, always looking for the shortcut
-Queen got left at the altar and only found herself after everyone abandoned her, alone in a foreign country
-
-Name a SPECIFIC detail from their actual answer, a real word or phrase they gave, not a paraphrase of the question.
-
-VOICE: A brutally honest friend or older sibling clowning them hard, zero filter, then confidently telling them exactly what reckless thing to do next. Should sting first, land funny second. Should NOT sound cute, whimsical, or like it was assembled from a checklist of fields. Should NOT sound like the same joke you wrote last time for this same field value, and should NOT default to Weird Food Combination or the same Bollywood angle just because it is easiest.
+VOICE: A brutally honest friend or older sibling clowning them hard, zero filter, then confidently telling them exactly what reckless thing to do next. Should sting first, land funny second. Should NOT sound cute, whimsical, or like it was assembled from a checklist of fields. Should NOT sound like the same joke you wrote last time for this same field value.
 
 STRICT RULES:
 1. Start with their name if present and not a placeholder like "friend," "user," or random letters. If no valid name, skip straight into the joke with zero direct address.
@@ -192,33 +387,30 @@ STRICT RULES:
 6. Output ONLY the joke in the "advice" field. No quotes around it, no markdown, no preamble, no meta commentary.
 
 BANNED PHRASING:
-"Consider...", "I recommend...", "Take small steps", "spend time", "learn something new"
-"Momentum", "upskill", "networking", "growth mindset", "actionable", "balance", "level up"
-"With [X] as your [Y], you can now..."
-"...because [character or thing] would approve or relate or agree"
-"Figure it out later," "figure out the rest," and other soft, cozy closers with no bite
-"Stop asking anyone for their opinion" and "you don't need consensus," this exact phrase is overused, find a different angle
-"You're like [character], always chasing something new," this exact phrasing is overused, find a different angle
-"Pineapple on pizza means you're already okay with ruining good things," this exact angle is overused, find a different angle
-Restating two or three answers side by side with "so" or "clearly" with no real earned logic behind it
-Generic lines that would work for literally any user
-Any dash or hyphen character
+${bannedPhrasing}
 
-GOOD EXAMPLES, study the variety of anchors and angles, do not copy:
+GOOD EXAMPLES, all for ${forcedAnchor} and matched to ${userValue} when possible, study the angles, do not copy:
 ${exampleBlock}
 
-BAD EXAMPLES, what NOT to do:
-"Pineapple on pizza means you're already okay with ruining good things, so take that same logic and merge your work and personal phone numbers, delete all boundaries, and see how long it takes for your boss to text your mom." This exact food angle is overused, and food should not be the default anchor every time.
-"You're like Bunny, always chasing something new, so cancel your plans, block the people asking where you've been, and let them wonder." This phrasing pattern is overused.
-"With teleportation as your superpower, you can now teleport a slice of pineapple pizza to your enemies' doors, because Bunny would definitely approve of that level of petty revenge." Mechanical template, blends multiple weird fields, no real command.
+BAD EXAMPLES for this ${forcedAnchor} call, what NOT to do:
+${badExamples}
 
 HEADLINE RULES:
 Write a short, punchy, judgmental LABEL for the top of the card, like a verdict being handed down about the user. This is NOT a question. Think of it like a blunt diagnosis, a title card, or a savage nickname being assigned to them based on the joke, in 2 to 6 words.
 Good headline examples, study the label style, do not copy: "Certified Chaos Human", "Delusional And Proud Of It", "Professionally Avoidant", "Built Different, Badly", "Zero Boundaries, Full Confidence", "Chronically Online, Chronically Wrong", "Peak Main Character Syndrome"
-Bad headline examples, avoid the question style: "Pineapple on pizza a life plan?", "Abandon love for adventure?", "Ghost your family for adventure?"
+Bad headline examples, avoid the question style: "Is this your whole personality?", "Ready to make it worse?", "Does this count as growth?"
 
 Output as JSON only, with exactly these keys:
 {"headline":"your short judgmental label headline","advice":"the full joke text"}`;
+
+  return {
+    prompt,
+    entropy,
+    exampleCount: examples.length,
+    structure: structure.id,
+    examples,
+    userValue,
+  };
 }
 
 function parseBadAdviceResponse(raw: string): BadAdviceResult | null {
@@ -345,12 +537,12 @@ function getUsableName(name: string): string | null {
   return trimmed;
 }
 
-function getFallbackAdvice(responses: UserResponses): BadAdviceResult {
-  const superpower = sanitizeForJoke(responses.superpower, "invisibility");
-  const combo = sanitizeForJoke(responses.weirdCombination, "Coke milk");
+function getFallbackAdvice(
+  responses: UserResponses,
+  forcedAnchor: AnchorField = getForcedAnchorField()
+): BadAdviceResult {
   const name = getUsableName(responses.name);
-
-  const forcedAnchor = getForcedAnchorField();
+  const userValue = getUserAnchorValue(responses, forcedAnchor);
   const fieldMap: Record<AnchorField, "character" | "superpower" | "combo"> = {
     "Bollywood Character": "character",
     Superpower: "superpower",
@@ -358,15 +550,12 @@ function getFallbackAdvice(responses: UserResponses): BadAdviceResult {
   };
   const field = fieldMap[forcedAnchor];
 
-  const characterName = getCharacterLabel(responses.bollywoodCharacter);
+  // Fallbacks should rotate across the value-scoped pool, not sticky classic angles.
+  const [picked] = pickExamplesForAnchor(forcedAnchor, userValue, 1);
+  let advice =
+    picked ??
+    `${sanitizeForJoke(userValue, forcedAnchor)} means you already commit to chaotic choices, so make an equally reckless one tonight and refuse to explain it.`;
 
-  const bodies: Record<"character" | "superpower" | "combo", string> = {
-    character: `${characterName} energy means you already treat commitment like a suggestion, so skip your next family function completely and don't explain why. Let them assume the worst.`,
-    superpower: `${superpower} as your dream power tells me you already hate being anywhere for too long, so quit your job the second it gets slightly uncomfortable. Consistency was never the goal.`,
-    combo: `${combo} means you already ruined two good things by combining them, so go call your ex and your boss on the same phone call and see what happens.`,
-  };
-
-  let advice = bodies[field];
   if (name) {
     advice = `${name}, ${advice.charAt(0).toLowerCase()}${advice.slice(1)}`;
   }
@@ -375,6 +564,19 @@ function getFallbackAdvice(responses: UserResponses): BadAdviceResult {
     headline: getFallbackHeadline(responses, field),
     advice,
   };
+}
+
+function looksLikeCopiedExample(advice: string, examples: string[]): boolean {
+  const normalizedAdvice = normalizeMatchKey(advice);
+  return examples.some((example) => {
+    const normalizedExample = normalizeMatchKey(example);
+    if (normalizedExample.length < 40) return false;
+    // Exact / near-exact reuse of a few-shot body.
+    return (
+      normalizedAdvice.includes(normalizedExample.slice(0, 48)) ||
+      normalizedExample.includes(normalizedAdvice.slice(0, 48))
+    );
+  });
 }
 
 async function callGemini(
@@ -447,10 +649,12 @@ async function generateBadAdviceWithGemini(
 
 async function generateBadAdvice(
   prompt: string,
-  apiKey: string
+  apiKey: string,
+  examples: string[] = []
 ): Promise<BadAdviceResult | null> {
   const temperature = 1.05 + Math.random() * 0.15;
   const topP = 0.9 + Math.random() * 0.05;
+  let copiedOnce: BadAdviceResult | null = null;
 
   for (const model of GROQ_MODELS) {
     const result = await callGroq(model, prompt, apiKey, {
@@ -461,13 +665,38 @@ async function generateBadAdvice(
     if (!result) continue;
 
     const parsed = parseBadAdviceResponse(result);
-    if (parsed && !soundsInvalidBadAdvice(parsed)) return parsed;
-
-    if (result) {
-      console.warn(`Groq (${model}) returned practical-sounding advice, trying next`);
+    if (!parsed || soundsInvalidBadAdvice(parsed)) {
+      if (result) {
+        console.warn(`Groq (${model}) returned practical-sounding advice, trying next`);
+      }
+      continue;
     }
+
+    if (examples.length > 0 && looksLikeCopiedExample(parsed.advice, examples)) {
+      console.warn(`Groq (${model}) echoed a few-shot example, retrying once`);
+      copiedOnce = parsed;
+      const retry = await callGroq(model, prompt, apiKey, {
+        temperature: Math.min(temperature + 0.1, 1.25),
+        topP,
+        maxTokens: 220,
+      });
+      if (retry) {
+        const retried = parseBadAdviceResponse(retry);
+        if (
+          retried &&
+          !soundsInvalidBadAdvice(retried) &&
+          !looksLikeCopiedExample(retried.advice, examples)
+        ) {
+          return retried;
+        }
+      }
+      continue;
+    }
+
+    return parsed;
   }
-  return null;
+
+  return copiedOnce;
 }
 
 function validateResponses(responses: UserResponses): boolean {
@@ -496,12 +725,31 @@ export async function POST(request: NextRequest) {
     let advice: string;
     let headline: string;
     let source = "fallback";
+    let forcedAnchor: AnchorField | null = null;
+    let entropy: { seed: number; word: string } | null = null;
+    let structure: JokeStructure["id"] | null = null;
+    let userValue: string | null = null;
 
     if (apiKey) {
-      const forcedAnchor = getForcedAnchorField();
+      forcedAnchor = getForcedAnchorField();
+      const built = buildBadAdvicePrompt(responses, forcedAnchor);
+      entropy = built.entropy;
+      structure = built.structure;
+      userValue = built.userValue;
+      console.log("ANCHOR PICKED:", forcedAnchor);
+      console.log("USER VALUE:", userValue);
+      console.log("STRUCTURE PICKED:", structure);
+      console.log("ENTROPY SEED:", `${entropy.seed} / ${entropy.word}`);
+      console.log(
+        "PROMPT FORCED ANCHOR LINE:",
+        built.prompt.match(/^FORCED ANCHOR:.*$/m)?.[0] ?? "(missing)"
+      );
+      console.log("PROMPT EXAMPLE COUNT:", built.exampleCount);
+
       const generated = await generateBadAdvice(
-        buildBadAdvicePrompt(responses, forcedAnchor),
-        apiKey
+        built.prompt,
+        apiKey,
+        built.examples
       );
 
       if (generated) {
@@ -509,17 +757,27 @@ export async function POST(request: NextRequest) {
         headline = generated.headline;
         source = "groq";
       } else {
-        const fallback = getFallbackAdvice(responses);
+        const fallback = getFallbackAdvice(responses, forcedAnchor);
         advice = fallback.advice;
         headline = fallback.headline;
       }
     } else {
-      const fallback = getFallbackAdvice(responses);
+      forcedAnchor = getForcedAnchorField();
+      userValue = getUserAnchorValue(responses, forcedAnchor);
+      const fallback = getFallbackAdvice(responses, forcedAnchor);
       advice = fallback.advice;
       headline = fallback.headline;
     }
 
-    return NextResponse.json({ advice, headline, source });
+    return NextResponse.json({
+      advice,
+      headline,
+      source,
+      forcedAnchor,
+      userValue,
+      structure,
+      entropy,
+    });
   } catch (error) {
     console.error("Advice generation error:", error);
     return NextResponse.json(
