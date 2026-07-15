@@ -45,27 +45,29 @@ export default function GradRightBridge() {
           </p>
         </div>
 
-        <h2 className="bridge-headline">
-          <span className="bridge-headline-strong">
-            Education is a second chance
-          </span>
-          <span className="bridge-headline-soft">
-            sometimes in a degree, sometimes in a certificate
-          </span>
-        </h2>
+        <div className="bridge-pitch">
+          <h2 className="bridge-headline">
+            <span className="bridge-headline-strong">
+              Education is a second chance
+            </span>
+            <span className="bridge-headline-soft">
+              sometimes in a degree, sometimes in a certificate
+            </span>
+          </h2>
 
-        <div className="bridge-features" role="list">
-          {FEATURES.map((feature) => (
-            <div key={feature.id} className="bridge-feature" role="listitem">
-              <span
-                className="material-symbols-outlined bridge-feature-icon"
-                aria-hidden="true"
-              >
-                {feature.icon}
-              </span>
-              <span className="bridge-feature-label">{feature.label}</span>
-            </div>
-          ))}
+          <div className="bridge-features" role="list">
+            {FEATURES.map((feature) => (
+              <div key={feature.id} className="bridge-feature" role="listitem">
+                <span
+                  className="material-symbols-outlined bridge-feature-icon"
+                  aria-hidden="true"
+                >
+                  {feature.icon}
+                </span>
+                <span className="bridge-feature-label">{feature.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <section className="bridge-cta-section">

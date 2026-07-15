@@ -2039,9 +2039,18 @@ select.input-field {
   font-weight: 700;
 }
 
+.bridge-pitch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
 .bridge-screen .bridge-headline {
-  margin: 0 auto 36px;
-  max-width: 30ch;
+  margin: 0 auto;
+  max-width: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2055,6 +2064,7 @@ select.input-field {
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
 .bridge-headline-soft {
@@ -2068,9 +2078,10 @@ select.input-field {
 .bridge-features {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 4px;
   width: 100%;
-  margin-bottom: 48px;
+  max-width: 100%;
+  margin-bottom: 0;
 }
 
 .bridge-feature {
@@ -2174,16 +2185,13 @@ select.input-field {
 }
 
 @media (max-width: 380px) {
+  .bridge-pitch {
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
   .bridge-lead {
     margin-bottom: 32px;
-  }
-
-  .bridge-screen .bridge-headline {
-    margin-bottom: 28px;
-  }
-
-  .bridge-features {
-    margin-bottom: 36px;
   }
 
   .bridge-lead-main {
