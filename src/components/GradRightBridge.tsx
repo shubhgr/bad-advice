@@ -6,7 +6,7 @@ import { APP_STORE_URL } from "@/lib/constants";
 const FEATURES = [
   {
     id: "recs",
-    icon: "recommend",
+    icon: "thumb_up",
     label: "Personalised Recommendations",
   },
   {
@@ -19,7 +19,7 @@ const FEATURES = [
 export default function GradRightBridge() {
   return (
     <div className="bridge-screen animate-fade-in">
-      <header className="bridge-top">
+      <div className="bridge-content">
         <a
           href="https://gradright.com"
           target="_blank"
@@ -44,53 +44,53 @@ export default function GradRightBridge() {
             <span className="bridge-lead-emphasis">isn&apos;t</span>.
           </p>
         </div>
-      </header>
 
-      <div className="bridge-main">
-        <div className="bridge-pitch">
-          <h2 className="bridge-headline">
-            <span className="bridge-headline-strong">
-              Education is a second chance
-            </span>
-            <span className="bridge-headline-soft">
-              sometimes in a degree, sometimes in a certificate
-            </span>
-          </h2>
+        <h2 className="bridge-headline">
+          <span className="bridge-headline-strong">
+            Education is a second chance
+          </span>
+          <span className="bridge-headline-soft">
+            sometimes in a degree, sometimes in a certificate
+          </span>
+        </h2>
 
-          <div className="bridge-features" role="list">
-            {FEATURES.map((feature) => (
-              <div key={feature.id} className="bridge-feature" role="listitem">
-                <span
-                  className="material-symbols-outlined bridge-feature-icon"
-                  aria-hidden="true"
-                >
-                  {feature.icon}
-                </span>
-                <span className="bridge-feature-label">{feature.label}</span>
-              </div>
-            ))}
+        <div className="bridge-features" role="list">
+          {FEATURES.map((feature) => (
+            <div key={feature.id} className="bridge-feature" role="listitem">
+              <span
+                className="material-symbols-outlined bridge-feature-icon"
+                aria-hidden="true"
+              >
+                {feature.icon}
+              </span>
+              <span className="bridge-feature-label">{feature.label}</span>
+            </div>
+          ))}
+        </div>
+
+        <section className="bridge-cta-section">
+          <p className="bridge-body">
+            An online degree, a certificate, a career upgrade. Find your right
+            fit with GradRight.
+          </p>
+
+          <div className="bridge-cta-block">
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bridge-cta-btn"
+            >
+              Download the App now!
+            </a>
+            <p className="bridge-cta-sub">
+              Pick from 120+ global universities
+            </p>
           </div>
-        </div>
-
-        <p className="bridge-body">
-          An online degree, a certificate, a career upgrade. Find your right fit
-          with GradRight.
-        </p>
-
-        <div className="bridge-cta-block">
-          <a
-            href={APP_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bridge-cta-btn"
-          >
-            Download the App now!
-          </a>
-          <p className="bridge-cta-sub">Pick from 120+ global universities</p>
-        </div>
+        </section>
       </div>
 
-      <div className="bridge-trust" aria-label="Trust badges">
+      <footer className="bridge-trust" aria-label="Trust badges">
         <p className="good-advice-trust-headline">
           Trusted by 2.5 lakh students
         </p>
@@ -143,7 +143,7 @@ export default function GradRightBridge() {
             </div>
           </div>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }
