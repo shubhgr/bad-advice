@@ -24,7 +24,7 @@ export default function GoodAdvice({
       <div className="good-advice-layout">
         <header className="good-advice-from">
           <p className="good-advice-from-label">
-            Here&apos;s some good advice from
+            Here&apos;s some good advice from your higher-ed copilot
           </p>
           <a
             href="https://gradright.com"

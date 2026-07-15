@@ -3,6 +3,7 @@
 import { useState } from "react";
 import LandingPage from "@/components/LandingPage";
 import FunnyAdvice from "@/components/FunnyAdvice";
+import GradRightBridge from "@/components/GradRightBridge";
 import GoodAdvice from "@/components/GoodAdvice";
 import GettingAdvice from "@/components/GettingAdvice";
 import Questionnaire from "@/components/Questionnaire";
@@ -15,6 +16,7 @@ type Step =
   | "questionnaire"
   | "getting-advice"
   | "funny-advice"
+  | "gradright-bridge"
   | "getting-good-advice"
   | "good-advice"
   | "recommendations";
@@ -73,6 +75,11 @@ export default function BadAdviceApp() {
     }
   }
 
+  function handleShowBridge() {
+    setError("");
+    setStep("gradright-bridge");
+  }
+
   async function handleWantRealAdvice() {
     if (!responses || !advice) return;
 
@@ -122,7 +129,7 @@ export default function BadAdviceApp() {
       } else {
         setError(err instanceof Error ? err.message : "Something went wrong");
       }
-      setStep("funny-advice");
+      setStep("gradright-bridge");
     } finally {
       clearTimeout(timeout);
       setIsLoadingGoodAdvice(false);
@@ -192,9 +199,13 @@ export default function BadAdviceApp() {
             <FunnyAdvice
               headline={adviceHeadline}
               advice={advice}
-              onShowRealAdvice={handleWantRealAdvice}
-              isLoadingRecommendations={isLoadingGoodAdvice}
+              onShowRealAdvice={handleShowBridge}
+              isLoadingRecommendations={false}
             />
+          )}
+
+          {step === "gradright-bridge" && (
+            <GradRightBridge onContinue={handleWantRealAdvice} />
           )}
 
           {step === "good-advice" && (

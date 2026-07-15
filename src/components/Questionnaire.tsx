@@ -80,6 +80,33 @@ const STEPS: StepConfig[] = [
   },
 ];
 
+function BackButton({ onBack }: { onBack: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onBack}
+      className="btn-outline questionnaire-back"
+      aria-label="Back"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M15 18l-6-6 6-6"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
+
 export default function Questionnaire({ onSubmit }: QuestionnaireProps) {
   const [stepIndex, setStepIndex] = useState(0);
   const [responses, setResponses] = useState<UserResponses>(EMPTY_RESPONSES);
@@ -136,12 +163,14 @@ export default function Questionnaire({ onSubmit }: QuestionnaireProps) {
 
       <div className="questionnaire-body">
         <div
-          className={`flex w-full flex-col ${
+          className={`relative flex w-full flex-col ${
             currentStep.kind === "image-choice"
               ? "character-question-layout"
               : "gap-6"
           }`}
         >
+          {stepIndex > 0 && <BackButton onBack={handleBack} />}
+
           <h2 className="text-xl font-bold leading-snug text-white">
             {currentStep.label}
           </h2>
@@ -157,10 +186,8 @@ export default function Questionnaire({ onSubmit }: QuestionnaireProps) {
                 autoFocus
               />
               <StepActions
-                stepIndex={stepIndex}
                 canProceed={canProceed()}
                 isFinal={isLastStep}
-                onBack={handleBack}
                 onNext={handleNext}
               />
             </form>
@@ -179,7 +206,9 @@ export default function Questionnaire({ onSubmit }: QuestionnaireProps) {
                   <button
                     key={option}
                     type="button"
-                    onClick={() => handleChoiceSelect(currentStep.field, option)}
+                    onClick={() =>
+                      handleChoiceSelect(currentStep.field, option)
+                    }
                     className={`option-button ${
                       currentStep.field === "areaToExplore"
                         ? "area-category-button"
@@ -190,15 +219,6 @@ export default function Questionnaire({ onSubmit }: QuestionnaireProps) {
                   </button>
                 ))}
               </div>
-              {stepIndex > 0 && (
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="btn-outline"
-                >
-                  Back
-                </button>
-              )}
             </div>
           )}
 
@@ -227,7 +247,9 @@ export default function Questionnaire({ onSubmit }: QuestionnaireProps) {
                       draggable={false}
                     />
                     <span className="character-card-footer">
-                      <span className="character-card-name">{character.name}</span>
+                      <span className="character-card-name">
+                        {character.name}
+                      </span>
                       <span className="character-card-trait">
                         {character.personalityTrait}
                       </span>
@@ -235,15 +257,6 @@ export default function Questionnaire({ onSubmit }: QuestionnaireProps) {
                   </button>
                 ))}
               </div>
-              {stepIndex > 0 && (
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="btn-outline character-step-back"
-                >
-                  Back
-                </button>
-              )}
             </div>
           )}
         </div>
@@ -253,16 +266,12 @@ export default function Questionnaire({ onSubmit }: QuestionnaireProps) {
 }
 
 function StepActions({
-  stepIndex,
   canProceed,
   isFinal,
-  onBack,
   onNext,
 }: {
-  stepIndex: number;
   canProceed: boolean;
   isFinal: boolean;
-  onBack: () => void;
   onNext: () => void;
 }) {
   return (
@@ -279,12 +288,6 @@ function StepActions({
           className="btn-primary disabled:opacity-60"
         >
           Next
-        </button>
-      )}
-
-      {stepIndex > 0 && (
-        <button type="button" onClick={onBack} className="btn-outline">
-          Back
         </button>
       )}
     </div>

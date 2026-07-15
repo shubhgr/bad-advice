@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bad Advice
 
-## Getting Started
+A GradRight parody quiz: answer a few cheeky questions, get deliberately terrible AI advice, then flip to real encouraging advice and online program picks.
 
-First, run the development server:
+Built with Next.js and Groq.
+
+## What it does
+
+1. **Quiz** — name, career stage, Bollywood character, superpower, weird food combo, learning interest  
+2. **Bad advice** — brutal, absurd joke advice from Groq (one forced quiz anchor per call for variety)  
+3. **Good advice** — sincere career encouragement plus matching online programs from CSV data  
+4. **CTA** — paths users toward GradRight signup
+
+The joke screen is entertainment-only (see the in-app disclaimer). GradRight does not give counterproductive advice to real customers.
+
+## Stack
+
+- **Next.js 16** (App Router) + React 19 + TypeScript  
+- **Tailwind CSS 4**  
+- **Groq** (`llama-3.3-70b-versatile` / `llama-3.1-8b-instant`) for advice generation  
+- Program recommendations from `src/data/online_programs.csv`
+
+## Setup
+
+```bash
+npm install
+```
+
+Create `.env.local` in the project root:
+
+```bash
+GROQ_API_KEY=your_groq_api_key
+```
+
+Without a key, the app still runs but uses local fallback joke / good-advice text.
+
+## Develop
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project layout
 
-## Learn More
+| Path | Purpose |
+|------|---------|
+| `src/components/` | Quiz UI, bad/good advice screens, loading states |
+| `src/app/api/advice/` | Bad advice generation (Groq + variety / anchor logic) |
+| `src/app/api/good-advice/` | Real advice generation |
+| `src/app/api/recommendations/` | Programs matched to learning interest |
+| `src/data/questionnaire.ts` | Questions and options |
+| `src/data/online_programs.csv` | Program catalog |
+| `src/lib/groq.ts` | Groq client |
 
-To learn more about Next.js, take a look at the following resources:
+## Notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Advice API routes are dynamic (`force-dynamic`) so per-request randomness is not cached.  
+- Bad advice pins one weird quiz field (Bollywood / superpower / food) per generation and value-scopes few-shot examples for variety.

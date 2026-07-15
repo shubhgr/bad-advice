@@ -35,9 +35,7 @@ export default function FunnyAdvice({
             disabled={isLoadingRecommendations}
             className="btn-accent disabled:opacity-60"
           >
-            {isLoadingRecommendations
-              ? "Getting good advice..."
-              : "Show Me Good Advice"}
+            {isLoadingRecommendations ? "Please wait..." : "Show Me Good Advice"}
           </button>
         </div>
       </div>
