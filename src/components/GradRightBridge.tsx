@@ -1,105 +1,149 @@
 "use client";
 
-interface GradRightBridgeProps {
-  onContinue: () => void;
-}
+import Image from "next/image";
+import { APP_STORE_URL } from "@/lib/constants";
 
-const OFFERS = [
-  { id: "programs", label: "Online Programs" },
-  { id: "outcomes", label: "Career Outcomes" },
-  { id: "guidance", label: "Guidance" },
-] as const;
-
-const AUDIENCES = [
+const FEATURES = [
   {
-    id: "working",
-    icon: "work",
-    lines: ["Working", "Professionals"],
+    id: "recs",
+    icon: "recommend",
+    label: "Personalised Recommendations",
   },
   {
-    id: "switchers",
-    icon: "school",
-    lines: ["Career", "Switchers"],
-  },
-  {
-    id: "founders",
-    icon: "rocket_launch",
-    lines: ["Entrepreneurs", "Freelancers"],
-  },
-  {
-    id: "rebooters",
-    icon: "person",
-    lines: ["Career", "Rebooters"],
+    id: "compare",
+    icon: "travel_explore",
+    label: "Compare 500+ global programs",
   },
 ] as const;
 
-export default function GradRightBridge({ onContinue }: GradRightBridgeProps) {
+export default function GradRightBridge() {
   return (
     <div className="bridge-screen animate-fade-in">
-      <header className="bridge-hero">
-        <h2 className="bridge-headline">
-          <span className="bridge-headline-struck">
-            Bad advice can be funny.
-          </span>
-          <span className="bridge-headline-line">
+      <header className="bridge-top">
+        <a
+          href="https://gradright.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bridge-logo-link"
+          aria-label="Visit GradRight website"
+        >
+          <Image
+            src="/gradright-logo.svg"
+            alt="GradRight"
+            width={140}
+            height={32}
+            className="bridge-logo"
+            priority
+          />
+        </a>
+
+        <div className="bridge-lead">
+          <p className="bridge-lead-muted">Bad advice can be funny.</p>
+          <p className="bridge-lead-main">
             The wrong career move{" "}
-            <span className="bridge-headline-emphasis">isn&apos;t</span>.
-          </span>
-        </h2>
-        <p className="bridge-body">
-          That&apos;s why GradRight exists. To help you choose the right online
-          programs and future proof your career.
-        </p>
+            <span className="bridge-lead-emphasis">isn&apos;t</span>.
+          </p>
+        </div>
       </header>
 
-      <section className="bridge-section bridge-section-offers" aria-labelledby="bridge-offers-title">
-        <h3 id="bridge-offers-title" className="bridge-section-title">
-          With GradRight you get
-        </h3>
-        <div className="bridge-offers" role="list">
-          {OFFERS.map((offer) => (
-            <div key={offer.id} className="bridge-offer" role="listitem">
-              <span className="bridge-offer-label">{offer.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      <div className="bridge-main">
+        <div className="bridge-pitch">
+          <h2 className="bridge-headline">
+            <span className="bridge-headline-strong">
+              Education is a second chance
+            </span>
+            <span className="bridge-headline-soft">
+              sometimes in a degree, sometimes in a certificate
+            </span>
+          </h2>
 
-      <section
-        className="bridge-section bridge-section-audience"
-        aria-labelledby="bridge-audience-title"
-      >
-        <h3 id="bridge-audience-title" className="bridge-section-title">
-          For professionals at every stage
-        </h3>
-        <div className="bridge-audiences">
-          {AUDIENCES.map(({ id, icon, lines }) => (
-            <div key={id} className="bridge-audience">
-              <span
-                className="material-symbols-outlined bridge-audience-icon"
-                aria-hidden="true"
-              >
-                {icon}
-              </span>
-              <span className="bridge-audience-label">
-                {lines[0]}
-                <br />
-                {lines[1]}
-              </span>
-            </div>
-          ))}
+          <div className="bridge-features" role="list">
+            {FEATURES.map((feature) => (
+              <div key={feature.id} className="bridge-feature" role="listitem">
+                <span
+                  className="material-symbols-outlined bridge-feature-icon"
+                  aria-hidden="true"
+                >
+                  {feature.icon}
+                </span>
+                <span className="bridge-feature-label">{feature.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </section>
 
-      <footer className="bridge-cta-block">
-        <p className="bridge-cta-line">
-          We&apos;ll help you get there{" "}
-          <span className="bridge-cta-emphasis">correctly</span>.
+        <p className="bridge-body">
+          An online degree, a certificate, a career upgrade. Find your right fit
+          with GradRight.
         </p>
-        <button type="button" onClick={onContinue} className="btn-accent">
-          Show Me Good Advice
-        </button>
-      </footer>
+
+        <div className="bridge-cta-block">
+          <a
+            href={APP_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bridge-cta-btn"
+          >
+            Download the App now!
+          </a>
+          <p className="bridge-cta-sub">Pick from 120+ global universities</p>
+        </div>
+      </div>
+
+      <div className="bridge-trust" aria-label="Trust badges">
+        <p className="good-advice-trust-headline">
+          Trusted by 2.5 lakh students
+        </p>
+        <div className="good-advice-trust-row">
+          <div className="good-advice-trust-item">
+            <span className="good-advice-trust-icon-wrap" aria-hidden="true">
+              <Image
+                src="/images/google-favicon.svg"
+                alt=""
+                width={34}
+                height={34}
+                className="good-advice-trust-icon"
+              />
+            </span>
+            <div className="good-advice-trust-copy">
+              <p className="good-advice-trust-title">Google Rating</p>
+              <div className="good-advice-trust-rating">
+                <span className="good-advice-trust-score">4.8</span>
+                <span className="good-advice-trust-stars" aria-hidden="true">
+                  ★★★★★
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="good-advice-trust-item">
+            <span className="good-advice-trust-icon-wrap" aria-hidden="true">
+              <Image
+                src="/images/iso-27001.png"
+                alt=""
+                width={34}
+                height={34}
+                className="good-advice-trust-icon"
+              />
+            </span>
+            <div className="good-advice-trust-copy">
+              <p className="good-advice-trust-title">ISO Certified</p>
+              <span className="good-advice-trust-verified" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <circle cx="9" cy="9" r="8" fill="#22c55e" />
+                  <path
+                    d="M5.5 9.2l2.1 2.1 4.9-4.9"
+                    stroke="#14532d"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

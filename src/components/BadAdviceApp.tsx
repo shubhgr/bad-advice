@@ -16,9 +16,9 @@ type Step =
   | "questionnaire"
   | "getting-advice"
   | "funny-advice"
-  | "gradright-bridge"
   | "getting-good-advice"
   | "good-advice"
+  | "gradright-bridge"
   | "recommendations";
 
 export default function BadAdviceApp() {
@@ -75,11 +75,6 @@ export default function BadAdviceApp() {
     }
   }
 
-  function handleShowBridge() {
-    setError("");
-    setStep("gradright-bridge");
-  }
-
   async function handleWantRealAdvice() {
     if (!responses || !advice) return;
 
@@ -129,11 +124,16 @@ export default function BadAdviceApp() {
       } else {
         setError(err instanceof Error ? err.message : "Something went wrong");
       }
-      setStep("gradright-bridge");
+      setStep("funny-advice");
     } finally {
       clearTimeout(timeout);
       setIsLoadingGoodAdvice(false);
     }
+  }
+
+  function handleShowBridge() {
+    setError("");
+    setStep("gradright-bridge");
   }
 
   function handleStartOver() {
@@ -148,12 +148,16 @@ export default function BadAdviceApp() {
   }
 
   const showMovingGradient =
-    step === "getting-good-advice" || step === "good-advice";
+    step === "getting-good-advice" ||
+    step === "good-advice" ||
+    step === "gradright-bridge";
 
   const gradientClassName = [
     "shell-moving-gradient",
     showMovingGradient ? "is-visible" : "",
-    step === "good-advice" ? "is-good-advice" : "",
+    step === "good-advice" || step === "gradright-bridge"
+      ? "is-good-advice"
+      : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -199,13 +203,9 @@ export default function BadAdviceApp() {
             <FunnyAdvice
               headline={adviceHeadline}
               advice={advice}
-              onShowRealAdvice={handleShowBridge}
-              isLoadingRecommendations={false}
+              onShowRealAdvice={handleWantRealAdvice}
+              isLoadingRecommendations={isLoadingGoodAdvice}
             />
-          )}
-
-          {step === "gradright-bridge" && (
-            <GradRightBridge onContinue={handleWantRealAdvice} />
           )}
 
           {step === "good-advice" && (
@@ -213,8 +213,11 @@ export default function BadAdviceApp() {
               aspirationalHeading={aspirationalHeading}
               advice={goodAdvice}
               recommendations={recommendations}
+              onContinue={handleShowBridge}
             />
           )}
+
+          {step === "gradright-bridge" && <GradRightBridge />}
 
           {step === "recommendations" && (
             <RecommendationsScreen
@@ -223,7 +226,9 @@ export default function BadAdviceApp() {
             />
           )}
         </main>
-        {step !== "good-advice" && <Disclaimer />}
+        {step !== "good-advice" && step !== "gradright-bridge" && (
+          <Disclaimer />
+        )}
       </div>
     </div>
   );
