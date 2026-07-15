@@ -5,9 +5,9 @@ interface GradRightBridgeProps {
 }
 
 const OFFERS = [
-  { id: "programs", step: "01", label: "Online Programs" },
-  { id: "outcomes", step: "02", label: "Career Outcomes" },
-  { id: "guidance", step: "03", label: "Guidance" },
+  { id: "programs", label: "Online Programs" },
+  { id: "outcomes", label: "Career Outcomes" },
+  { id: "guidance", label: "Guidance" },
 ] as const;
 
 const AUDIENCES = [
@@ -59,7 +59,6 @@ export default function GradRightBridge({ onContinue }: GradRightBridgeProps) {
         <div className="bridge-offers" role="list">
           {OFFERS.map((offer) => (
             <div key={offer.id} className="bridge-offer" role="listitem">
-              <span className="bridge-offer-step">{offer.step}</span>
               <span className="bridge-offer-label">{offer.label}</span>
             </div>
           ))}
