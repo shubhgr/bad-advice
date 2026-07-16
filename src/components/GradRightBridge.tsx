@@ -12,7 +12,7 @@ const FEATURES = [
   {
     id: "compare",
     icon: "travel_explore",
-    label: "Compare 500+ global programs",
+    label: "Compare 500+ Global Programs",
   },
 ] as const;
 
