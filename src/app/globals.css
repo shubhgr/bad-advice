@@ -536,9 +536,12 @@ select.input-field {
   padding: 0.9rem 1rem;
   background: #ffffff08;
   border: 1px solid #ffffff12;
-
+  border-radius: 0;
   color: #ffffff;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
+  font: inherit;
   overflow: hidden;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;

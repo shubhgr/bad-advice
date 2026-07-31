@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { SIGNUP_URL } from "@/lib/constants";
 import { Course } from "@/lib/types";
 
 interface GoodAdviceProps {
@@ -64,11 +63,10 @@ export default function GoodAdvice({
         {programCount > 0 && (
           <div className="good-advice-programs" aria-label="Recommended programs">
             {recommendations.slice(0, 2).map((course, index) => (
-              <a
+              <button
                 key={course.id}
-                href={SIGNUP_URL}
-                target="_top"
-                rel="noopener noreferrer"
+                type="button"
+                onClick={onContinue}
                 className={
                   index === 0
                     ? "good-advice-program-card"
@@ -91,7 +89,7 @@ export default function GoodAdvice({
                     <p className="good-advice-program-host">By {course.source}</p>
                   ) : null}
                 </div>
-              </a>
+              </button>
             ))}
           </div>
         )}
