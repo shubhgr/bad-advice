@@ -1,13 +1,17 @@
+"use client";
+
 import Image from "next/image";
-import { APP_STORE_URL } from "@/lib/constants";
+import { useAppStoreUrl } from "@/hooks/useAppStoreUrl";
 
 export function AppDownloadCta() {
+  const appStoreUrl = useAppStoreUrl();
+
   return (
     <section className="app-download-cta">
       <h3 className="app-download-footer-title">Get the App for More Details</h3>
 
       <a
-        href={APP_STORE_URL}
+        href={appStoreUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="app-download-button"

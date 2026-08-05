@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { APP_STORE_URL } from "@/lib/constants";
+import { useAppStoreUrl } from "@/hooks/useAppStoreUrl";
 
 const FEATURES = [
   {
@@ -17,6 +17,8 @@ const FEATURES = [
 ] as const;
 
 export default function GradRightBridge() {
+  const appStoreUrl = useAppStoreUrl();
+
   return (
     <div className="bridge-screen animate-fade-in">
       <div className="bridge-content">
@@ -78,7 +80,7 @@ export default function GradRightBridge() {
 
           <div className="bridge-cta-block">
             <a
-              href={APP_STORE_URL}
+              href={appStoreUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="bridge-cta-btn"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LandingPage from "@/components/LandingPage";
 import FunnyAdvice from "@/components/FunnyAdvice";
 import GradRightBridge from "@/components/GradRightBridge";
@@ -10,6 +10,7 @@ import Questionnaire from "@/components/Questionnaire";
 import RecommendationsScreen from "@/components/RecommendationsScreen";
 import Disclaimer from "@/components/Disclaimer";
 import { Course, UserResponses } from "@/lib/types";
+import { captureTrackingFromLocation } from "@/lib/utm";
 
 type Step =
   | "landing"
@@ -31,6 +32,10 @@ export default function BadAdviceApp() {
   const [recommendations, setRecommendations] = useState<Course[]>([]);
   const [isLoadingGoodAdvice, setIsLoadingGoodAdvice] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    captureTrackingFromLocation();
+  }, []);
 
   async function handleQuestionnaireSubmit(userResponses: UserResponses) {
     setError("");
