@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useAppStoreUrl } from "@/hooks/useAppStoreUrl";
+import { trackAppDownloadClick } from "@/lib/track";
 
 const FEATURES = [
   {
@@ -18,6 +19,13 @@ const FEATURES = [
 
 export default function GradRightBridge() {
   const appStoreUrl = useAppStoreUrl();
+
+  function handleDownloadClick() {
+    trackAppDownloadClick({
+      href: appStoreUrl,
+      location: "bridge",
+    });
+  }
 
   return (
     <div className="bridge-screen animate-fade-in">
@@ -84,6 +92,8 @@ export default function GradRightBridge() {
               target="_blank"
               rel="noopener noreferrer"
               className="bridge-cta-btn"
+              data-track="bad_advice_download_click"
+              onClick={handleDownloadClick}
             >
               Download the App now!
             </a>
