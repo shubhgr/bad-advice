@@ -7,7 +7,6 @@ const TRACKING_KEYS = [
   "utm_campaign",
   "utm_term",
   "utm_content",
-  "c",
 ] as const;
 
 export type TrackingParams = Partial<
@@ -19,7 +18,6 @@ export const DEFAULT_APP_STORE_TRACKING: TrackingParams = {
   utm_source: "LP",
   utm_medium: "Bad_Advice_2026",
   utm_campaign: "Bad_Advice_Event",
-  c: "gbRSz",
 };
 
 export const APP_STORE_BASE_URL = "https://link.gradright.com/";
@@ -70,10 +68,13 @@ export function captureTrackingFromLocation(
   return readStoredTracking();
 }
 
-/** Resolved tracking: URL/session first, then defaults for any missing keys. */
+/** Resolved tracking: URL/session only — no extra defaults like `c`. */
 export function getTrackingParams(): TrackingParams {
   const captured = captureTrackingFromLocation();
-  return { ...DEFAULT_APP_STORE_TRACKING, ...captured };
+  if (Object.keys(captured).length === 0) {
+    return { ...DEFAULT_APP_STORE_TRACKING };
+  }
+  return captured;
 }
 
 /** App download URL with the same UTMs the user arrived with. */

@@ -222,7 +222,9 @@ export default function BadAdviceApp() {
             />
           )}
 
-          {step === "gradright-bridge" && <GradRightBridge />}
+          {step === "gradright-bridge" && (
+            <GradRightBridge userName={responses?.name ?? ""} />
+          )}
 
           {step === "recommendations" && (
             <RecommendationsScreen

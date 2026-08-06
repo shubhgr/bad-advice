@@ -17,13 +17,14 @@ const FEATURES = [
   },
 ] as const;
 
-export default function GradRightBridge() {
+export default function GradRightBridge({ userName }: { userName?: string }) {
   const appStoreUrl = useAppStoreUrl();
 
   function handleDownloadClick() {
     trackAppDownloadClick({
       href: appStoreUrl,
       location: "bridge",
+      name: userName,
     });
   }
 
