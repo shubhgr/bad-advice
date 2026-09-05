@@ -8,6 +8,7 @@ export type DownloadClickRow = {
   utmCampaign: string;
   utmTerm: string;
   utmContent: string;
+  c: string;
   downloadUrl: string;
   userAgent: string;
   referrer: string;
@@ -40,6 +41,7 @@ export async function appendDownloadClickRow(row: DownloadClickRow): Promise<voi
       utm_campaign: row.utmCampaign,
       utm_term: row.utmTerm,
       utm_content: row.utmContent,
+      c: row.c,
       href: row.downloadUrl,
       user_agent: row.userAgent,
       referrer: row.referrer,

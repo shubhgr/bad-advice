@@ -16,6 +16,7 @@ type DownloadClickBody = {
   utm_campaign?: string;
   utm_term?: string;
   utm_content?: string;
+  c?: string;
   referrer?: string;
 };
 
@@ -46,6 +47,7 @@ export async function POST(request: NextRequest) {
       utmCampaign: body.utm_campaign?.trim() || "",
       utmTerm: body.utm_term?.trim() || "",
       utmContent: body.utm_content?.trim() || "",
+      c: body.c?.trim() || "",
       downloadUrl: body.href?.trim() || "",
       userAgent: request.headers.get("user-agent") || "",
       referrer: body.referrer?.trim() || request.headers.get("referer") || "",

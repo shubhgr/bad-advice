@@ -7,6 +7,7 @@ const TRACKING_KEYS = [
   "utm_campaign",
   "utm_term",
   "utm_content",
+  "c",
 ] as const;
 
 export type TrackingParams = Partial<
@@ -68,7 +69,7 @@ export function captureTrackingFromLocation(
   return readStoredTracking();
 }
 
-/** Resolved tracking: URL/session only — no extra defaults like `c`. */
+/** Resolved tracking: URL/session first. Only includes `c` when it arrived in the URL. */
 export function getTrackingParams(): TrackingParams {
   const captured = captureTrackingFromLocation();
   if (Object.keys(captured).length === 0) {

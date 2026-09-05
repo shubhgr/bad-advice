@@ -32,6 +32,7 @@ function sendDownloadClickToApi(payload: DownloadClickPayload): void {
     utm_campaign: payload.utm_campaign,
     utm_term: payload.utm_term,
     utm_content: payload.utm_content,
+    c: payload.c,
     referrer: document.referrer,
   });
 
