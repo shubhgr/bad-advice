@@ -22,17 +22,13 @@ export type DownloadClickPayload = {
 } & TrackingParams;
 
 function sendDownloadClickToApi(payload: DownloadClickPayload): void {
+  const { event: _event, location, button, href, name, ...tracking } = payload;
   const body = JSON.stringify({
-    location: payload.location,
-    button: payload.button,
-    href: payload.href,
-    name: payload.name,
-    utm_source: payload.utm_source,
-    utm_medium: payload.utm_medium,
-    utm_campaign: payload.utm_campaign,
-    utm_term: payload.utm_term,
-    utm_content: payload.utm_content,
-    c: payload.c,
+    location,
+    button,
+    href,
+    name,
+    ...tracking,
     referrer: document.referrer,
   });
 
