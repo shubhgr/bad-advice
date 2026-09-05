@@ -1,0 +1,282 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bad Advice Complete Guide</title><style>body{font-family:Arial,sans-serif;max-width:800px;margin:40px auto;line-height:1.6;color:#222}h1{color:#1a1a2e;border-bottom:2px solid #6c5ce7;padding-bottom:8px}h2{color:#2d3436;margin-top:32px}h3{color:#636e72;margin-top:20px}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #ddd;padding:8px}pre{background:#f5f5f5;padding:12px;font-size:12px;white-space:pre-wrap}code{background:#f0f0f0;padding:2px 4px}ul{margin:8px 0 8px 24px}hr{margin:24px 0;border:none;border-top:1px solid #ddd}</style></head><body><p><h1>Bad Advice App — Complete Guide (Non-Technical)</h1></p><p><strong>Document for:</strong> GradRight / Marketing / Product team  
+<strong>App URL:</strong> https://bad-advice.vercel.app  
+<strong>Embedded on:</strong> https://gradright.com/get-bad-advice/  
+<strong>Last updated:</strong> August 2026</p><p><hr></p><p><h2>1. What is this app?</h2></p><p>Bad Advice is a <strong>fun parody quiz</strong> by GradRight. Users answer silly questions, get <strong>deliberately terrible joke advice</strong> from AI, then see <strong>real encouraging advice</strong> and <strong>online course recommendations</strong>.</p><p><strong>Important:</strong> The bad advice screen is <strong>entertainment only</strong>. It is not real career guidance. A disclaimer appears on the site.</p><p><hr></p><p><h2>2. User journey (step by step)</h2></p><p>1. <strong>Landing page</strong> — User clicks “Give Me Bad Advice”
+<li><strong>Quiz (6 questions)</strong> — Name, career stage, Bollywood character, superpower, food combo, learning interest</li>
+<li><strong>Loading screen</strong> — “Getting advice…” (about 1 second minimum)</li>
+<li><strong>Bad Advice screen</strong> — Shows a funny headline + savage joke advice</li>
+<li><strong>Good Advice screen</strong> — Real, warm career advice + program cards</li>
+<li><strong>Last page (Bridge)</strong> — GradRight pitch + “Download the App now!” button</li>
+<li><strong>Download click</strong> — Logged to Google Sheet (with name + UTMs)</p><p><hr></p><p><h2>3. Quiz questions (everything we collect)</h2></p><p><h3>Question 1 — Name</h3></li>
+<strong>Question shown:</strong> “Drop your name so I know who to blame later”  
+<strong>Type:</strong> Free text (user types their name)  
+<strong>Example:</strong> Shubh, Priya, Rahul</p><p><hr></p><p><h3>Question 2 — Career stage</h3>
+<strong>Question shown:</strong> “Cool cool... so how do you waste your time these days?”</p><p><strong>Options:</strong>
+<ul><li>Studying</li>
+<li>Working a Corporate Job</li>
+<li>Running a Business</li>
+<li>On a Career Break</li>
+<li>Creating Content</li>
+<li>Something Else</li>
+</ul>
+<hr></p><p><h3>Question 3 — Bollywood character</h3>
+<strong>Question shown:</strong> “Pick the character you unfortunately (or fortunately) relate to.”</p><p><strong>Options (with personality):</strong></p><p><table border="1" cellpadding="6"><tr><td>Character</td><td>Personality trait</td></tr>
+</table>
+<table border="1" cellpadding="6"><tr><td>Raju</td><td>Funny, chaotic & always scheming</td></tr>
+<tr><td>Rani (Queen)</td><td>Innocent, Overthinker, Occasional Crier</td></tr>
+<tr><td>Rancho</td><td>Wise, Kind, Curious</td></tr>
+<tr><td>Om</td><td>Dramatic, Loyal, Romantic</td></tr>
+<tr><td>Bunny</td><td>Bold, Adventurous</td></tr>
+<tr><td>Geet</td><td>Witty & Unapologetically Herself</td></tr>
+</table>
+<hr></p><p><h3>Question 4 — Superpower</h3>
+<strong>Question shown:</strong> “If the universe handed you one power, what are you taking?”</p><p><strong>Options:</strong>
+<ul><li>Read minds</li>
+<li>Teleportation</li>
+<li>Invisibility</li>
+<li>Shape-shifting</li>
+<li>Immortality</li>
+<li>Flying</li>
+</ul>
+<hr></p><p><h3>Question 5 — Weird food combination</h3>
+<strong>Question shown:</strong> “Which of these food combos looks like a good idea to you?”</p><p><strong>Options:</strong>
+<ul><li>Maggi + Ketchup</li>
+<li>Pineapple on Pizza</li>
+<li>Cheetos + Curd</li>
+<li>Khakhra + Nutella</li>
+<li>Fries + Ice Cream</li>
+<li>Coke + Milk</li>
+</ul>
+<hr></p><p><h3>Question 6 — Learning interest</h3>
+<strong>Question shown:</strong> “Pick the field that gives your brain cells a little dopamine hit.”</p><p><strong>Options:</strong>
+<ul><li>Business & Finance</li>
+<li>Marketing, HR & Ops</li>
+<li>CS, Tech & STEM</li>
+<li>Data & AI</li>
+<li>Healthcare & Medicine</li>
+<li>Education & Arts</li>
+</ul>
+<hr></p><p><h2>4. How bad advice is generated (simple explanation)</h2></p><p>When the user finishes the quiz, the app sends all 6 answers to an <strong>AI system (Groq / Llama model)</strong>.</p><p>The AI is instructed to:
+<ul><li>Write <strong>brutally bad, funny, savage joke advice</strong></li>
+<li><strong>Never</strong> give real or helpful advice</li>
+<li>Build the joke around <strong>ONE random “anchor” answer</strong> from the quiz:</li>
+</ul>  - Either Bollywood character <strong>OR</strong>
+  - Superpower <strong>OR</strong>
+  - Weird food combination
+<ul><li>Use the user’s <strong>name</strong> if it looks like a real name</li>
+<li>Return two things:</li>
+</ul>  - <strong>Headline</strong> — short label like “Certified Chaos Human” (2–6 words)
+  - <strong>Advice</strong> — the joke text (2–3 sentences)</p><p>Each time someone plays, the system also randomises:
+<ul><li>Which anchor field is used (character / superpower / food)</li>
+<li>Which joke structure is used (roast / fake logic / literal)</li>
+<li>Which example jokes are shown to the AI as inspiration</li>
+<li>A random “entropy seed” so answers feel different each time</li>
+</ul>
+If the AI fails or gives too-sensible advice, the app uses a <strong>pre-written fallback joke</strong> from the same example library.</p><p><hr></p><p><h2>5. What data goes into the AI prompt</h2></p><p>The AI receives a profile like this:</p><p><pre>
+Name: Shubh
+Current Situation: Studying
+Learning Interest: Data & AI
+Bollywood Character: Bunny
+Superpower: Teleportation
+Weird Food Combination: Coke + Milk
+</pre></p><p><strong>But for the joke itself</strong>, the AI is told to focus on <strong>only ONE anchor</strong>, for example:</p><p><pre>
+FORCED ANCHOR: Superpower
+USER VALUE FOR THIS ANCHOR: Teleportation
+</pre></p><p>Career stage and learning interest are <strong>background only</strong> — not the main joke.</p><p><hr></p><p><h2>6. Joke structures (one picked randomly each time)</h2></p><p><h3>Structure A — Roast then command</h3>
+Roast the user on something unrelated, then tell them to do something reckless.</p><p><h3>Structure B — Fake logic bridge then command</h3>
+Take their answer, draw a broken but confident conclusion, then give a savage command.</p><p><h3>Structure C — Literal minded take then command</h3>
+Follow their answer too literally into a bad conclusion, then tell them to act on it.</p><p><hr></p><p><h2>7. Headline rules</h2></p><p>The headline is <strong>not a question</strong>. It is a short judgmental label.</p><p><strong>Good examples:</strong>
+<ul><li>Certified Chaos Human</li>
+<li>Delusional And Proud Of It</li>
+<li>Professionally Avoidant</li>
+<li>Built Different, Badly</li>
+<li>Zero Boundaries, Full Confidence</li>
+<li>Peak Main Character Syndrome</li>
+</ul>
+<strong>Bad examples (avoid):</strong>
+<ul><li>Is this your whole personality?</li>
+<li>Ready to make it worse?</li>
+</ul>
+<hr></p><p><h2>8. Voice and tone rules</h2></p><p><ul><li>Sounds like a brutally honest friend clowning the user</li>
+<li>Should <strong>sting first, land funny second</strong></li>
+<li>Must end with a <strong>direct reckless command</strong> (quit, ghost, burn, delete, etc.)</li>
+<li>2–3 sentences maximum</li>
+<li>0–2 emojis only if they actually land</li>
+<li>No dashes or hyphens in the text</li>
+<li>Must NOT sound like real career advice</li>
+</ul>
+<hr></p><p><h2>9. Banned phrases (AI must never use these)</h2></p><p><ul><li>“Consider…”</li>
+<li>“I recommend…”</li>
+<li>“Take small steps”</li>
+<li>“Spend time” / “Learn something new”</li>
+<li>“Momentum”, “upskill”, “networking”, “growth mindset”</li>
+<li>“Actionable”, “balance”, “level up”</li>
+<li>“With [X] as your [Y], you can now…”</li>
+<li>“…because [character] would approve or relate”</li>
+<li>“Figure it out later”</li>
+<li>“Stop asking anyone for their opinion”</li>
+<li>Generic lines that would work for any user</li>
+</ul>
+<hr></p><p><h2>10. Full AI prompt template</h2></p><p>Below is the exact instruction template sent to the AI. Placeholders like <code>{name}</code> change per user.</p><p><hr></p><p><pre>
+You write BRUTALLY BAD, savage, absurd advice as a joke. Deliberately terrible. Never practical. Never helpful. It does NOT have to be about careers, it can be about their life, habits, personality, hygiene, social life, plans, anything. Their career or quiz info is just raw material for the joke, not the required topic.</p><p>USER DATA:
+Name: [user name or "skip, no usable name"]
+Current Situation: [career stage]
+Learning Interest: [area to explore]
+Bollywood Character: [character name]
+Superpower: [superpower]
+Weird Food Combination: [food combo]</p><p>FORCED ANCHOR: [Bollywood Character OR Superpower OR Weird Food Combination]
+USER VALUE FOR THIS ANCHOR: [their exact answer for that field]
+You MUST build the entire joke around this exact field and this exact user value only. Ignore every other weird quiz answer completely.</p><p>ENTROPY SEED: [random number] / [random word]
+Do not mention this seed or word in the output. Silently let it push you toward a different angle.</p><p>CRITICAL, DO NOT ECHO THE EXAMPLES BELOW:
+The good examples below show STYLE and STRUCTURE only. Do not reuse the same target, action, or premise from any example.</p><p>CRITICAL, AVOID THE OBVIOUS ANGLE:
+Do not default to the most obvious joke for their answer. Pick a fresh angle.</p><p>FIELD PRIORITY:
+Your only allowed weird field this call is: [forced anchor] ([user value])
+Name can be used alongside the forced anchor if it's a real name.</p><p>BORING and GENERIC (side detail only, never the whole joke):
+Current Situation, Learning Interest</p><p>USE ONLY THE FORCED ANCHOR FIELD FOR THIS JOKE.</p><p>BANNED STRUCTURE:
+"[Field A] as your [X], you can now [random action], because [Field B] would approve"</p><p>IT MUST BE ADVICE WITH TEETH:
+Every output must aggressively instruct the user to do something specific and reckless using direct commands.</p><p>HOW TO WRITE THE JOKE:
+[One of: ROAST THEN COMMAND / FAKE LOGIC BRIDGE THEN COMMAND / LITERAL MINDED TAKE THEN COMMAND]</p><p>[Anchor-specific guidance for superpower, food, or Bollywood character]</p><p>VOICE: A brutally honest friend clowning them hard, zero filter.</p><p>STRICT RULES:
+<li>Start with their name if present and not a placeholder. If no valid name, skip straight into the joke.</li>
+<li>2 to 3 sentences max.</li>
+<li>Do not use dash or hyphen characters anywhere.</li>
+<li>Must end on a real, reckless direct command.</li>
+<li>0 to 2 emojis max.</li>
+<li>The target and action must differ from every example shown below.</li>
+<li>Output ONLY JSON with keys "headline" and "advice".</p><p>BANNED PHRASING:</li>
+[list of banned phrases]</p><p>GOOD EXAMPLES (study angle and structure only, do not copy):
+[3-4 matched examples for this user's anchor value]</p><p>BAD EXAMPLES (what NOT to do):
+[2-3 bad examples]</p><p>HEADLINE RULES:
+Short, punchy, judgmental LABEL. 2 to 6 words. NOT a question.</p><p>Output as JSON only:
+{"headline":"your short judgmental label headline","advice":"the full joke text"}
+</pre></p><p><hr></p><p><h2>11. All example jokes (what we show the AI as inspiration)</h2></p><p>These are <strong>not shown to users directly</strong>. They teach the AI the style. The AI must write something <strong>new</strong>, not copy these.</p><p><hr></p><p><h3>Superpower examples</h3></p><p><strong>Teleportation</strong>
+<li>Teleportation as your dream power tells me you already hate being anywhere for too long, so quit your job the second it gets slightly uncomfortable. Consistency was never the goal.</li>
+<li>Teleportation means exits are your whole personality, so leave the next family dinner without explaining, and reply to every follow up with just left, sorry.</li>
+<li>You picked Teleportation, so stop finishing any conversation that lasts more than ninety seconds, just vanish mid sentence and let them talk to the wall.</li>
+<li>Teleportation means you treat staying put like a personal insult, so ghost the group project tonight and ping them from a coffee shop two cities over.</p><p><strong>Invisibility</strong></li>
+<li>Since your superpower is invisibility and you wing it on everything, stop showing up to work entirely. Nobody will notice, and if they do, let them explain to HR why they even remember you.</li>
+<li>Invisibility as your dream power means you've been practicing disappearing from hard conversations for years, so mute every group chat that says we need to talk and never unmute them.</li>
+<li>Invisibility was your pick, so RSVP yes to every invitation and then simply never arrive, treat attendance as optional folklore.</li>
+<li>You wanted Invisibility, so stop defending your decisions out loud, make the chaotic call silently and let other people discover the damage later.</p><p><strong>Read minds</strong></li>
+<li>Mind reading means you never actually listen to anyone, so stop letting people finish their sentences starting today, you already know what they're going to say, probably.</li>
+<li>Mind reading as your power means you treat listening like optional homework, so interrupt every coworker update with I already know and walk away mid sentence.</li>
+<li>You chose Read minds, so answer every text with the reply you invented for them and refuse corrections, your version is canon now.</li>
+<li>Read minds means empathy is just spoilers to you, so skip every therapy session and diagnose your friends in the group chat instead.</p><p><strong>Immortality</strong></li>
+<li>Immortality means you never had to face consequences on any real timeline, so quit saving money entirely, you have infinite time to fix it later, probably.</li>
+<li>You picked immortality, so stop making any decisions with urgency ever again, that promotion can wait a few centuries, what's the rush.</li>
+<li>Immortality as your power means deadlines are a joke to you, so miss every submission window on purpose and call it long term thinking.</li>
+<li>Since you wanted Immortality, burn that calendar app tonight, recurring reminders are for people who run out of time.</p><p><strong>Flying</strong></li>
+<li>Flying was your pick, which means you've always wanted an excuse to leave a room mid conversation, so start doing that in every meeting starting tomorrow, just walk out.</li>
+<li>Flying means altitude is your conflict style, so the next time someone criticizes you, stand up, leave, and take the stairs like you're above it.</li>
+<li>You wanted Flying, so stop sitting through feedback, schedule every review as a standup and leave the second it gets honest.</li>
+<li>Flying as your dream power means you confuse escape with growth, so book a one way ticket the next time work gets boring and dare anyone to stop you.</p><p><strong>Shape-shifting</strong></li>
+<li>Shape shifting means you never had to commit to being one version of yourself, so start showing up to every family event as a completely different person and let them figure it out.</li>
+<li>Shape shifting was your pick, so rewrite your LinkedIn headline every morning this week and pretend each one has always been true.</li>
+<li>You chose Shape shifting, so answer every personal question with a new origin story, consistency is for people with one face.</li>
+<li>Shape shifting means loyalty to a single identity feels boring, so cancel your plans as whoever you were yesterday and show up as someone new.</p><p><hr></p><p><h3>Food combination examples</h3></p><p><strong>Coke + Milk</strong></li>
+<li>Coke milk means you already ruined two good things by combining them, so go call your ex and your boss on the same phone call and see what happens.</li>
+<li>Coke milk was a bold choice nobody asked you to make, so make an equally bold choice nobody asked for and quit your job over text today.</li>
+<li>Coke + Milk means you trust bad chemistry, so merge your personal inbox with your work email tonight and refuse to sort it.</li>
+<li>You picked Coke + Milk, so introduce two friends who openly hate each other and leave the chat immediately.</p><p><strong>Maggi + Ketchup</strong></li>
+<li>Maggi with ketchup means you'll settle for the fastest fix available even when it makes things worse, so apply that same energy to your next big life decision and just wing it.</li>
+<li>Maggi with ketchup means timing matters more than taste to you, so submit every application half finished and treat urgency like a personality trait.</li>
+<li>Maggi + Ketchup means you dress up mediocre solutions, so slap a confident title on a draft you barely wrote and hit send.</li>
+<li>You chose Maggi + Ketchup, so microwave every hard conversation, keep it under two minutes and leave before anyone digests it.</p><p><strong>Fries + Ice Cream</strong></li>
+<li>Fries with ice cream tells me you've never once let hot and cold coexist peacefully, so go mix your savings account and your credit card debt the same way and call it balance.</li>
+<li>Fries with ice cream means you prefer emotional whiplash over stability, so accept and decline the same offer twice in one day and make them adapt to you.</li>
+<li>Fries + Ice Cream means contrast is your love language, so tell your team the plan is locked then change it twice before lunch.</li>
+<li>You picked Fries + Ice Cream, so schedule a celebration dinner and a breakup talk on the same night and see which vibe wins.</p><p><strong>Cheetos + Curd</strong></li>
+<li>Cheetos with curd means you genuinely cannot leave one single thing simple, so take your resume, which is already fine, and add unnecessary complications to it starting tonight.</li>
+<li>Cheetos with curd tells me you ruin clean systems on purpose, so forward your calendar invite chaos to every teammate tonight and call it collaboration.</li>
+<li>Cheetos + Curd means simple plans offend you, so turn a five line email into a thirteen slide deck by midnight.</li>
+<li>You chose Cheetos + Curd, so overseason every boundary talk, bring three unrelated complaints and leave them confused on purpose.</p><p><strong>Khakhra + Nutella</strong></li>
+<li>Khakhra and Nutella means you turned a diet snack into a dessert without asking permission from anyone, so rebrand your unemployment as a sabbatical and dare someone to correct you.</li>
+<li>Khakhra + Nutella means you sell indulgence as discipline, so post that you are grinding while you nap through the afternoon.</li>
+<li>You picked Khakhra + Nutella, so hide every lazy choice behind wellness vocabulary and refuse follow up questions.</li>
+<li>Khakhra + Nutella tells me healthy on the outside is enough for you, so ship half baked work with a polished cover slide and clock out.</p><p><strong>Pineapple on Pizza</strong></li>
+<li>Pineapple on pizza means sweet and savory make sense to you when nothing else does, so mix your work slack and your family group chat into one and let chaos pick a side.</li>
+<li>Pineapple on Pizza means you enjoy dividing a room, so announce an unpopular opinion in the family WhatsApp and double down when they fight.</li>
+<li>You chose Pineapple on Pizza, so put two incompatible demands in the same reply tonight and force everyone else to reconcile them.</li>
+<li>Pineapple on Pizza means controversy is comfort food, so pick the option everyone told you not to pick and narrate it like vision.</p><p><hr></p><p><h3>Bollywood character examples</h3></p><p><strong>Bunny</strong></li>
+<li>Bunny ditched his own engagement to fly to Paris alone, so skip your next family function completely and don't explain why. Let them assume the worst.</li>
+<li>Bunny treated commitment like a rumor, so cancel every weekend plan you've already confirmed and reply with maybe later forever.</li>
+<li>Bunny energy means escape beats obligation, so leave the next commitment mid event and text landing soon from nowhere specific.</li>
+<li>You relate to Bunny, so treat every RSVP as negotiable theater, confirm loudly then flake louder.</p><p><strong>Rancho</strong></li>
+<li>You relate to Rancho the most, so walk into your next exam, humiliate the professor with a philosophical question, and get expelled with your dignity intact, that's the whole plot.</li>
+<li>Rancho hated systems that reward obedience, so refuse every process doc at work and answer only in questions until they stop assigning you tasks.</li>
+<li>Rancho means rules are dares to you, so break the smallest policy first thing tomorrow and narrate it as integrity.</li>
+<li>You picked Rancho, so turn the next standup into a TED talk nobody asked for and leave mid applause.</p><p><strong>Om</strong></li>
+<li>Om spent literal decades obsessing over one person, so pick one email you never sent and just keep almost sending it for the next twenty years, that's basically loyalty.</li>
+<li>Om energy means you romanticize unfinished business, so reopen one dead conversation tonight and refuse to let it stay buried.</li>
+<li>You relate to Om, so bookmark one person from your past and check their profile on a schedule like it's a ritual.</li>
+<li>Om never moved on, so write a long unsent note every week and call that emotional work.</p><p><strong>Geet</strong></li>
+<li>Geet talked to a total stranger about her entire life plan within minutes of meeting him, so tell your Uber driver everything about your career doubts tonight, he's basically a licensed therapist now.</li>
+<li>Geet overshared immediately and somehow made it destiny, so put your whole career crisis in your LinkedIn headline tonight and refuse to edit it down.</li>
+<li>Geet means privacy is optional, so dump your five year plan on the next stranger in line and ask them to decide for you.</li>
+<li>You chose Geet, so narrate your entire morning meltdown in the work chat with no context and keep typing.</p><p><strong>Raju</strong></li>
+<li>Raju hustled and lied his way through every single scheme he ever ran, so exaggerate your job title on every form you fill out from now on, technically it's just optimism.</li>
+<li>Raju always needed a shortcut, so invent a fake deadline, bluff competence in the meeting, and let future you clean up the damage.</li>
+<li>Raju energy means the workaround is the plan, so forge confidence first and learn the skill never.</li>
+<li>You relate to Raju, so pitch an impossible timeline today, collect the credit, and disappear when delivery starts.</p><p><strong>Rani / Queen</strong></li>
+<li>Rani got left alone in a foreign country and somehow turned it into a whole personality, so get dumped this week if you have to, character development doesn't wait for convenient timing.</li>
+<li>Rani energy means solitude is content, so book a solo trip you cannot afford and treat every inconvenience like lore.</li>
+<li>You picked Rani, so cut one supportive person out this week just to prove you can handle life louder alone.</li>
+<li>Queen found herself after everyone left, so stage a dramatic exit from a group plan and rebuild the night as a main character montage.</p><p><hr></p><p><h2>12. Fallback headlines (if AI fails)</h2></p><p><table border="1" cellpadding="6"><tr><td>Anchor type</td><td>Fallback headline</td></tr></li>
+</table>
+<table border="1" cellpadding="6"><tr><td>Bollywood character</td><td>Peak Main Character Syndrome</td></tr>
+<tr><td>Superpower</td><td>Professionally Avoidant</td></tr>
+<tr><td>Food combination</td><td>Certified Chaos Human</td></tr>
+</table>
+<hr></p><p><h2>13. AI technology used</h2></p><p><table border="1" cellpadding="6"><tr><td>Setting</td><td>Value</td></tr>
+</table>
+<table border="1" cellpadding="6"><tr><td>Provider</td><td>Groq</td></tr>
+<tr><td>Primary model</td><td>llama-3.3-70b-versatile</td></tr>
+<tr><td>Backup model</td><td>llama-3.1-8b-instant</td></tr>
+<tr><td>Temperature</td><td>1.05 to 1.20 (high = more creative/random)</td></tr>
+<tr><td>Max length</td><td>~220 tokens (short response)</td></tr>
+<tr><td>Required secret</td><td>GROQ_API_KEY (stored in Vercel, not public)</td></tr>
+</table>
+<hr></p><p><h2>14. UTM tracking & download clicks</h2></p><p><h3>How UTMs flow</h3>
+<li>User opens GradRight URL with UTMs, e.g.:  </li>
+   <code>https://gradright.com/get-bad-advice/?utm_source=QR_Standee_GGN&utm_medium=Bad_Advice_2026_GGN&utm_campaign=Bad_Advice_Event_GGN</code>
+<li>WordPress passes same UTMs into iframe:  </li>
+   <code>https://bad-advice.vercel.app/?utm_source=...</code>
+<li>App saves UTMs for the whole session</li>
+<li>Download button uses same UTMs on:  </li>
+   <code>https://link.gradright.com/?utm_source=...</code>
+<li>Click is logged to Google Sheet in background</p><p><h3>What gets logged per download click</h3></p><p><table border="1" cellpadding="6"><tr><td>Column</td><td>Example</td></tr></li>
+</table>
+<table border="1" cellpadding="6"><tr><td>Timestamp</td><td>2026-08-06T08:00:58Z</td></tr>
+<tr><td>Page</td><td>bridge</td></tr>
+<tr><td>Button</td><td>Download the App now!</td></tr>
+<tr><td>Name</td><td>Shubh (from quiz)</td></tr>
+<tr><td>UTM Source</td><td>QR_Standee_GGN</td></tr>
+<tr><td>UTM Medium</td><td>Bad_Advice_2026_GGN</td></tr>
+<tr><td>UTM Campaign</td><td>Bad_Advice_Event_GGN</td></tr>
+<tr><td>UTM Term</td><td>(empty if not in URL)</td></tr>
+<tr><td>UTM Content</td><td>(empty if not in URL)</td></tr>
+<tr><td>Download URL</td><td>Full link with UTMs</td></tr>
+<tr><td>User Agent</td><td>Browser/device info</td></tr>
+<tr><td>Referrer</td><td>Where they came from</td></tr>
+</table>
+<h3>Google Sheet</h3>
+<strong>Name:</strong> Download Click Tracking (Bad Advice)</p><p><hr></p><p><h2>15. Disclaimer (shown on site)</h2></p><p>“This website is created as a parody and for entertainment purposes only. GradRight does not intend or provide any counter productive advice for users and customers.”</p><p><hr></p><p><h2>16. Good advice (separate from bad advice)</h2></p><p>After bad advice, users can click to get <strong>real advice</strong>. That uses a <strong>different AI prompt</strong> focused on:
+<ul><li>Learning interest (main)</li>
+<li>Career stage (main)</li>
+<li>Warm, sincere, helpful tone</li>
+<li>No jokes or roasting</li>
+</ul>
+Program recommendations come from a CSV file of online courses matched to learning interest.</p><p><hr></p><p><h2>17. Key URLs</h2></p><p><table border="1" cellpadding="6"><tr><td>Purpose</td><td>URL</td></tr>
+</table>
+<table border="1" cellpadding="6"><tr><td>Live app</td><td>https://bad-advice.vercel.app</td></tr>
+<tr><td>GradRight embed</td><td>https://gradright.com/get-bad-advice/</td></tr>
+<tr><td>App download link</td><td>https://link.gradright.com/</td></tr>
+<tr><td>GitHub repo</td><td>https://github.com/shubhgr/bad-advice</td></tr>
+</table>
+<hr></p><p><h2>18. Example test URLs (for QA)</h2></p><p><strong>Full UTM test:</strong>
+<pre>
+https://bad-advice.vercel.app/?utm_source=QR_Standee_GGN&utm_medium=Bad_Advice_2026_GGN&utm_campaign=Bad_Advice_Event_GGN
+</pre></p><p><strong>Local test:</strong>
+<pre>
+http://localhost:3000/?utm_source=QR_Standee_GGN&utm_medium=Bad_Advice_2026_GGN&utm_campaign=Bad_Advice_Event_GGN
+</pre></p><p><hr></p><p>*End of document*
+</p></body></html>
