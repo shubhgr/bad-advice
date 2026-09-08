@@ -2587,7 +2587,7 @@ select.input-field {
 
 /* Flow 2 prototype */
 .flow-two-content {
-  padding: 20px;
+  padding: 0;
 }
 
 .flow-two-screen {
@@ -2606,7 +2606,7 @@ select.input-field {
 .flow-two-logo-link {
   position: absolute;
   left: 50%;
-  bottom: 8px;
+  bottom: 18px;
   z-index: 3;
   display: inline-flex;
   flex-shrink: 0;
@@ -2629,6 +2629,8 @@ select.input-field {
   gap: 28px;
   width: 100%;
   min-height: 0;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .flow-two-copy-panel {
@@ -2658,7 +2660,7 @@ select.input-field {
   isolation: isolate;
   gap: 0.95rem;
   overflow: hidden;
-  padding: 2.05rem 1.15rem 1.55rem;
+  padding: 2.05rem 1.75rem 1.55rem;
   background:
     linear-gradient(272deg, #ffffff1c, #ffffff00),
     radial-gradient(circle at 50% 0, #ffffff1a, #ffffff00 42%);

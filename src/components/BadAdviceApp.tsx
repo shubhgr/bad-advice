@@ -3,11 +3,9 @@
 import { useEffect, useState } from "react";
 import LandingPage from "@/components/LandingPage";
 import FunnyAdvice from "@/components/FunnyAdvice";
-import GradRightBridge from "@/components/GradRightBridge";
-import GoodAdvice from "@/components/GoodAdvice";
+import Flow2AfterAdvice from "@/components/Flow2AfterAdvice";
 import GettingAdvice from "@/components/GettingAdvice";
 import Questionnaire from "@/components/Questionnaire";
-import RecommendationsScreen from "@/components/RecommendationsScreen";
 import Disclaimer from "@/components/Disclaimer";
 import { Course, UserResponses } from "@/lib/types";
 import { captureTrackingFromLocation } from "@/lib/utm";
@@ -18,9 +16,7 @@ type Step =
   | "getting-advice"
   | "funny-advice"
   | "getting-good-advice"
-  | "good-advice"
-  | "gradright-bridge"
-  | "recommendations";
+  | "flow-2";
 
 export default function BadAdviceApp() {
   const [step, setStep] = useState<Step>("landing");
@@ -122,7 +118,7 @@ export default function BadAdviceApp() {
       setGoodAdvice(data.advice);
       setAspirationalHeading(data.aspirationalHeading || "");
       setRecommendations(recData.recommendations || []);
-      setStep("good-advice");
+      setStep("flow-2");
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
         setError("Request timed out. Please try again.");
@@ -136,33 +132,13 @@ export default function BadAdviceApp() {
     }
   }
 
-  function handleShowBridge() {
-    setError("");
-    setStep("gradright-bridge");
-  }
-
-  function handleStartOver() {
-    setStep("landing");
-    setResponses(null);
-    setAdvice("");
-    setAdviceHeadline("");
-    setGoodAdvice("");
-    setAspirationalHeading("");
-    setRecommendations([]);
-    setError("");
-  }
-
   const showMovingGradient =
-    step === "getting-good-advice" ||
-    step === "good-advice" ||
-    step === "gradright-bridge";
+    step === "getting-good-advice" || step === "flow-2";
 
   const gradientClassName = [
     "shell-moving-gradient",
     showMovingGradient ? "is-visible" : "",
-    step === "good-advice" || step === "gradright-bridge"
-      ? "is-good-advice"
-      : "",
+    step === "flow-2" ? "is-good-advice" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -183,7 +159,10 @@ export default function BadAdviceApp() {
       </div>
 
       <div className="mobile-frame">
-        <main className="mobile-content">
+        <main
+          className={`mobile-content${step === "flow-2" ? " flow-two-content" : ""}`}
+          style={step === "flow-2" ? { position: "relative", zIndex: 1 } : undefined}
+        >
           {error && (
             <div className="mb-6 border border-white/30 bg-white/10 px-4 py-3 text-center text-sm text-white">
               {error}
@@ -213,29 +192,16 @@ export default function BadAdviceApp() {
             />
           )}
 
-          {step === "good-advice" && (
-            <GoodAdvice
+          {step === "flow-2" && (
+            <Flow2AfterAdvice
               aspirationalHeading={aspirationalHeading}
               advice={goodAdvice}
-              recommendations={recommendations}
-              onContinue={handleShowBridge}
-            />
-          )}
-
-          {step === "gradright-bridge" && (
-            <GradRightBridge userName={responses?.name ?? ""} />
-          )}
-
-          {step === "recommendations" && (
-            <RecommendationsScreen
-              recommendations={recommendations}
-              onStartOver={handleStartOver}
+              programs={recommendations}
+              trackLocation="main-flow-2"
             />
           )}
         </main>
-        {step !== "good-advice" && step !== "gradright-bridge" && (
-          <Disclaimer />
-        )}
+        {step !== "flow-2" && <Disclaimer />}
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ export default function FunnyAdvice({
           </div>
 
           <p className="advice-footer-plug">
-            Sounds terrible, right? I know. Now let&apos;s fix that.
+            Sounds terrible, right? I know.
           </p>
 
           <button
@@ -35,7 +35,9 @@ export default function FunnyAdvice({
             disabled={isLoadingRecommendations}
             className="btn-accent disabled:opacity-60"
           >
-            {isLoadingRecommendations ? "Please wait..." : "Show Me Good Advice"}
+            {isLoadingRecommendations
+              ? "Please wait..."
+              : "Now let's fix that"}
           </button>
         </div>
       </div>
