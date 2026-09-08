@@ -2219,3 +2219,559 @@ select.input-field {
     font-size: 0.75rem;
   }
 }
+
+/* Final test page — merged GradRight proof of concept */
+.final-test-content {
+  padding: 0;
+}
+
+.final-test-screen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center !important;
+  position: relative !important;
+  isolation: isolate;
+  gap: 14px;
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  padding: 56px 0 58px;
+  box-sizing: border-box;
+}
+
+.final-test-provider-bg {
+  z-index: -2;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: -18px !important;
+  width: calc(100% + 36px) !important;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: center bottom;
+  opacity: 0.5;
+  filter: saturate(1.1) contrast(1.04);
+  mask-image: none;
+  -webkit-mask-image: none;
+  transform: none;
+}
+
+.final-test-provider-overlay {
+  position: absolute;
+  inset: 0 -18px;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.94) 0%, rgba(0, 0, 0, 0.7) 32%, rgba(0, 0, 0, 0.3) 66%, rgba(0, 0, 0, 0.14) 100%),
+    radial-gradient(circle at 50% 72%, rgba(182, 245, 74, 0.12), transparent 30%),
+    radial-gradient(circle at 50% 92%, rgba(120, 43, 255, 0.32), transparent 48%);
+  pointer-events: none;
+}
+
+.final-test-header {
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 0;
+}
+
+.final-test-screen > :not(.final-test-trust) {
+  transform: none;
+}
+
+.final-test-advice-card {
+  width: 88%;
+  max-width: 360px;
+  padding: 1.55rem 1.15rem 1.25rem;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)),
+    radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0.12), transparent 42%);
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow:
+    0 22px 56px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.final-test-advice-card .advice-quote-mark {
+  top: -0.4rem;
+  left: 10%;
+  font-size: 4.25rem;
+}
+
+.final-test-advice-card .good-advice-card-headline {
+  font-size: clamp(1.25rem, 5vw, 1.6rem);
+  line-height: 1.12;
+}
+
+.final-test-advice-card .good-advice-card-body {
+  max-width: 32ch;
+  margin-inline: auto;
+  font-size: 0.875rem;
+}
+
+.final-test-program-block {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: -2px;
+}
+
+.final-test-programs-plug {
+  color: #ffffff;
+  max-width: 15ch;
+  margin-inline: auto;
+  font-size: clamp(1.15rem, 4.7vw, 1.4rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+}
+
+.final-test-program-toggle {
+  appearance: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.final-test-program-toggle:hover,
+.final-test-program-toggle:focus-visible {
+  color: #ffffff;
+  outline: none;
+  text-decoration-thickness: 2px;
+}
+
+.final-test-features {
+  display: none;
+}
+
+.final-test-offer-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 0;
+  color: #b6f54a;
+  max-width: 13ch;
+  font-size: clamp(1.45rem, 6vw, 2rem);
+  font-weight: 850;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+  text-align: center;
+  text-shadow: 0 0 28px rgba(182, 245, 74, 0.18);
+}
+
+.final-test-offer-hero strong {
+  color: #ffffff;
+  font: inherit;
+}
+
+.final-test-cta-section {
+  gap: 0;
+  width: 88%;
+  margin-top: 0;
+}
+
+.final-test-cta-btn {
+  min-height: 54px;
+  padding-inline: 22px;
+  font-size: 1rem;
+}
+
+.final-test-trust {
+  position: absolute !important;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: none;
+  margin-top: 0 !important;
+  padding-top: 10px;
+}
+
+.final-test-program-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.final-test-program-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background:
+    radial-gradient(circle at 30% 65%, rgba(120, 43, 255, 0.34), transparent 42%),
+    rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  animation: final-test-backdrop-in 0.28s ease-out both;
+}
+
+.final-test-program-panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(100%, 520px);
+  max-height: min(78dvh, 680px);
+  padding: 18px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background:
+    linear-gradient(180deg, rgba(38, 31, 54, 0.94), rgba(10, 10, 14, 0.96)),
+    rgba(0, 0, 0, 0.9);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.55),
+    0 0 42px rgba(120, 43, 255, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  animation: final-test-modal-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.final-test-program-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.final-test-program-eyebrow {
+  margin: 0 0 4px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.final-test-program-modal-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.final-test-program-close {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.final-test-program-close:hover,
+.final-test-program-close:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+  outline: none;
+}
+
+.final-test-programs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.32) transparent;
+}
+
+.final-test-program-card {
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.07);
+  animation: final-test-program-card-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--program-delay, 120ms);
+}
+
+@keyframes final-test-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes final-test-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes final-test-program-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 380px) {
+  .final-test-content {
+    padding: 0;
+  }
+
+  .final-test-screen {
+    gap: 14px;
+    justify-content: flex-start;
+  }
+
+  .final-test-advice-card {
+    padding: 1.8rem 1rem 1.35rem;
+  }
+
+  .final-test-cta-btn {
+    font-size: 0.9rem;
+  }
+
+  .final-test-program-panel {
+    max-height: 82dvh;
+    padding: 16px;
+  }
+}
+
+/* Flow 2 prototype */
+.flow-two-content {
+  padding: 20px;
+}
+
+.flow-two-screen {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100%;
+  padding-bottom: 48px;
+  box-sizing: border-box;
+  gap: 22px;
+}
+
+.flow-two-logo-link {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  z-index: 3;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+  line-height: 0;
+  transition: opacity 0.2s;
+}
+
+.flow-two-logo-link:hover {
+  opacity: 0.85;
+}
+
+.flow-two-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+  width: 100%;
+  min-height: 0;
+}
+
+.flow-two-copy-panel {
+  text-align: center;
+}
+
+.flow-two-kicker {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.flow-two-copy {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(2rem, 8vw, 2.75rem);
+  font-weight: 750;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.flow-two-advice-card {
+  isolation: isolate;
+  gap: 0.95rem;
+  overflow: hidden;
+  padding: 2.05rem 1.15rem 1.55rem;
+  background:
+    linear-gradient(272deg, #ffffff1c, #ffffff00),
+    radial-gradient(circle at 50% 0, #ffffff1a, #ffffff00 42%);
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
+}
+
+.flow-two-advice-card::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 58%);
+  pointer-events: none;
+}
+
+.flow-two-advice-card .advice-quote-mark {
+  top: 0.35rem;
+  left: 1rem;
+  transform: none;
+  font-size: 4rem;
+  line-height: 0.8;
+  color: rgba(255, 255, 255, 0.16);
+}
+
+.flow-two-advice-card .good-advice-card-headline {
+  font-size: clamp(1.55rem, 6vw, 2rem);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.flow-two-advice-card .good-advice-card-body {
+  max-width: 34ch;
+  margin-inline: auto;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.flow-two-next {
+  width: 100%;
+}
+
+.flow-two-program-screen {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: 18px 0 0;
+}
+
+.flow-two-standee-bg {
+  z-index: -2;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.24;
+  filter: saturate(1.18) contrast(1.05);
+}
+
+.flow-two-standee-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.44) 34%, rgba(0, 0, 0, 0.74) 100%),
+    radial-gradient(circle at 50% 18%, rgba(120, 43, 255, 0.2), transparent 46%);
+  pointer-events: none;
+}
+
+.flow-two-program-header {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.flow-two-program-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.15rem, 4.8vw, 1.45rem);
+  font-weight: 750;
+  line-height: 1.16;
+  letter-spacing: -0.035em;
+}
+
+.flow-two-offer {
+  margin: 8px 0 0;
+  color: #b6f54a;
+  font-size: 0.875rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.flow-two-program-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.flow-two-program-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px 0;
+  scrollbar-width: none;
+}
+
+.flow-two-program-list::-webkit-scrollbar {
+  display: none;
+}
+
+.flow-two-program-card {
+  padding: 0.82rem 0.95rem;
+}
+
+.flow-two-download {
+  flex-shrink: 0;
+}
+
+@media (max-width: 380px) {
+  .flow-two-screen {
+    gap: 18px;
+  }
+
+  .flow-two-copy {
+    font-size: 1.8rem;
+  }
+
+  .flow-two-program-card {
+    padding: 0.8rem 0.9rem;
+  }
+}

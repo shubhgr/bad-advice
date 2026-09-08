@@ -15,7 +15,11 @@ export function useAppStoreUrl(): string {
   const [url, setUrl] = useState(() => getAppStoreUrl(DEFAULT_APP_STORE_TRACKING));
 
   useEffect(() => {
-    setUrl(getAppStoreUrl(getTrackingParams()));
+    const frame = window.requestAnimationFrame(() => {
+      setUrl(getAppStoreUrl(getTrackingParams()));
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   return url;
