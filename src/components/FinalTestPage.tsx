@@ -75,6 +75,32 @@ export default function FinalTestPage({ programs }: { programs: Course[] }) {
       </div>
 
       <div className="mobile-frame">
+        {showGoodAdvice && (
+          <Image
+            src="/images/flow-2-provider-wall-original.jpg"
+            alt=""
+            width={957}
+            height={1024}
+            aria-hidden="true"
+            unoptimized
+            style={{
+              bottom: 0,
+              filter: "saturate(1.12) contrast(1.05)",
+              height: "auto",
+              left: 0,
+              maskImage:
+                "linear-gradient(180deg, transparent 0%, transparent 26%, rgba(0,0,0,0.32) 46%, rgba(0,0,0,0.86) 72%, #000 100%)",
+              opacity: 0.72,
+              pointerEvents: "none",
+              position: "absolute",
+              WebkitMaskImage:
+                "linear-gradient(180deg, transparent 0%, transparent 26%, rgba(0,0,0,0.32) 46%, rgba(0,0,0,0.86) 72%, #000 100%)",
+              width: "100%",
+              zIndex: 0,
+            }}
+          />
+        )}
+
         <main className="mobile-content final-test-content">
           {!showGoodAdvice && (
             <div className="advice-screen animate-fade-in">
@@ -113,16 +139,6 @@ export default function FinalTestPage({ programs }: { programs: Course[] }) {
             className="final-test-screen animate-fade-in"
             style={{ justifyContent: "flex-start" }}
           >
-            <Image
-              src="/images/flow-2-provider-wall-tall.jpg"
-              alt=""
-              fill
-              sizes="480px"
-              className="final-test-provider-bg"
-              aria-hidden="true"
-            />
-            <div className="final-test-provider-overlay" aria-hidden="true" />
-
             <header
               className="good-advice-from final-test-header"
               style={{
@@ -283,7 +299,7 @@ export default function FinalTestPage({ programs }: { programs: Course[] }) {
               className="final-test-program-modal"
               role="dialog"
               aria-modal="true"
-              aria-labelledby="final-test-program-title"
+              aria-label="Recommended Healthcare and Medicine programs"
               style={{ position: "absolute" }}
             >
               <button
@@ -296,14 +312,12 @@ export default function FinalTestPage({ programs }: { programs: Course[] }) {
                 <div className="final-test-program-modal-head">
                   <div>
                     <p className="final-test-program-eyebrow">
-                      Recommended for you
+                      Personalised matches
                     </p>
-                    <h2
-                      id="final-test-program-title"
-                      className="final-test-program-modal-title"
-                    >
-                      8 Healthcare &amp; Medicine programs
-                    </h2>
+                    <p className="final-test-program-modal-subtitle">
+                      Compare these online options, then continue to GradRight to
+                      unlock your 15% offer.
+                    </p>
                   </div>
                   <button
                     type="button"

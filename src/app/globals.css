@@ -2222,7 +2222,16 @@ select.input-field {
 
 /* Final test page — merged GradRight proof of concept */
 .final-test-content {
+  position: relative;
+  z-index: 1;
   padding: 0;
+}
+
+.final-test-content > .advice-screen {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 20px;
 }
 
 .final-test-screen {
@@ -2230,14 +2239,14 @@ select.input-field {
   flex: 1;
   flex-direction: column;
   align-items: center;
-  justify-content: center !important;
+  justify-content: flex-start !important;
   position: relative !important;
   isolation: isolate;
-  gap: 14px;
+  gap: 52px;
   width: 100%;
   min-height: 100%;
   overflow: hidden;
-  padding: 56px 0 58px;
+  padding: 122px 0 58px;
   box-sizing: border-box;
 }
 
@@ -2245,8 +2254,8 @@ select.input-field {
   z-index: -2;
   top: 0 !important;
   bottom: 0 !important;
-  left: -18px !important;
-  width: calc(100% + 36px) !important;
+  left: 0 !important;
+  width: 100% !important;
   height: 100% !important;
   object-fit: cover;
   object-position: center bottom;
@@ -2259,7 +2268,7 @@ select.input-field {
 
 .final-test-provider-overlay {
   position: absolute;
-  inset: 0 -18px;
+  inset: 0;
   z-index: -1;
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0.94) 0%, rgba(0, 0, 0, 0.7) 32%, rgba(0, 0, 0, 0.3) 66%, rgba(0, 0, 0, 0.14) 100%),
@@ -2278,10 +2287,17 @@ select.input-field {
   transform: none;
 }
 
+.final-test-advice-card,
+.final-test-program-block,
+.final-test-offer-hero,
+.final-test-cta-section {
+  transform: none;
+}
+
 .final-test-advice-card {
-  width: 88%;
-  max-width: 360px;
-  padding: 1.55rem 1.15rem 1.25rem;
+  width: calc(92% - 40px);
+  max-width: 430px;
+  padding: 1.2rem 1rem 1rem;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)),
     radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0.12), transparent 42%);
@@ -2292,37 +2308,39 @@ select.input-field {
 }
 
 .final-test-advice-card .advice-quote-mark {
-  top: -0.4rem;
+  top: -0.3rem;
   left: 10%;
-  font-size: 4.25rem;
+  font-size: 3.4rem;
 }
 
 .final-test-advice-card .good-advice-card-headline {
-  font-size: clamp(1.25rem, 5vw, 1.6rem);
+  font-size: clamp(1.2rem, 4.8vw, 1.5rem);
   line-height: 1.12;
+  letter-spacing: -0.03em;
 }
 
 .final-test-advice-card .good-advice-card-body {
-  max-width: 32ch;
   margin-inline: auto;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
+  line-height: 1.48;
 }
 
 .final-test-program-block {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  margin-top: -2px;
+  width: calc(92% - 40px);
+  max-width: 430px;
+  margin-top: 0;
 }
 
 .final-test-programs-plug {
   color: #ffffff;
-  max-width: 15ch;
   margin-inline: auto;
-  font-size: clamp(1.15rem, 4.7vw, 1.4rem);
+  font-size: clamp(1rem, 4.2vw, 1.22rem);
   font-weight: 800;
-  line-height: 1.12;
+  line-height: 1.08;
   letter-spacing: -0.04em;
+  max-width: 342px;
 }
 
 .final-test-program-toggle {
@@ -2352,11 +2370,10 @@ select.input-field {
   width: 100%;
   margin-top: 0;
   color: #b6f54a;
-  max-width: 13ch;
-  font-size: clamp(1.45rem, 6vw, 2rem);
+  font-size: clamp(1.34rem, 5.5vw, 1.72rem);
   font-weight: 850;
-  line-height: 0.98;
-  letter-spacing: -0.06em;
+  line-height: 0.96;
+  letter-spacing: -0.05em;
   text-align: center;
   text-shadow: 0 0 28px rgba(182, 245, 74, 0.18);
 }
@@ -2368,14 +2385,15 @@ select.input-field {
 
 .final-test-cta-section {
   gap: 0;
-  width: 88%;
-  margin-top: 0;
+  width: calc(92% - 40px);
+  max-width: 430px;
+  margin-top: -20px;
 }
 
 .final-test-cta-btn {
-  min-height: 54px;
+  min-height: 48px;
   padding-inline: 22px;
-  font-size: 1rem;
+  font-size: 0.92rem;
 }
 
 .final-test-trust {
@@ -2438,26 +2456,36 @@ select.input-field {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 18px;
+  padding-bottom: 2px;
 }
 
 .final-test-program-eyebrow {
-  margin: 0 0 4px;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
   line-height: 1.2;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .final-test-program-modal-title {
   margin: 0;
   color: #ffffff;
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.45rem, 5.6vw, 2.05rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.final-test-program-modal-subtitle {
+  max-width: 30ch;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 .final-test-program-close {
