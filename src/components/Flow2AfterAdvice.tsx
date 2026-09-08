@@ -101,12 +101,14 @@ export default function Flow2AfterAdvice({
           <h1 className="flow-two-copy">
             So much for your
             <br />
-            attention
+            time &amp; attention
             <br />
-            to sell you
+            for what?
             <br />
-            <span style={{ whiteSpace: "nowrap" }}>
-              what <span style={{ color: "#b6f54a" }}>you need.</span>
+            <span style={{ color: "#b6f54a" }}>
+              To sell you what
+              <br />
+              you need.
             </span>
           </h1>
           <button
