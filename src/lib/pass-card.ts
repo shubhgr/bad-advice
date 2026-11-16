@@ -1,6 +1,5 @@
 /**
- * Six content placeholders from the brief.
- * Swap these when quiz → result mapping is ready.
+ * GradRight Pass card content.
  *
  * 1. personalityTitle  → display headline
  * 2. personalityRead   → glass pill
@@ -14,9 +13,18 @@
  * `memberNo` → top-right Doto number
  */
 
+import type { UserResponses } from "@/lib/types";
+
 export type PassTraitIcon = "lightning" | "search" | "tabs" | "rocket";
 
 export type PassMascotGender = "female" | "male";
+
+/** Stable ids for the four Pass personality results. */
+export type PassPersonalityId =
+  | "certified-overthinker"
+  | "certified-yapper"
+  | "the-never-settler"
+  | "the-thorough-planner";
 
 /** Kept for config continuity (coupon lives off-card for now). */
 export const PASS_UNLOCK_TRIGGER: "download" | "print" | "either" = "download";
@@ -34,6 +42,7 @@ export interface PassCardContent {
   name: string;
   memberNo: string;
   tagline: string;
+  personalityId?: PassPersonalityId;
 }
 
 /** Real report-card example (Aarav) — used to stress-test layout & fit-text. */
@@ -121,13 +130,6 @@ export function buildPassTraits(pass: PassCardContent) {
   ];
 }
 
-/** Stable ids for the four Pass personality results. */
-export type PassPersonalityId =
-  | "certified-overthinker"
-  | "certified-yapper"
-  | "the-never-settler"
-  | "the-thorough-planner";
-
 export interface PassPersonality {
   id: PassPersonalityId;
   title: string;
@@ -191,4 +193,152 @@ export function getPassPersonalityMascot(
   title: string | null | undefined,
 ): string | undefined {
   return getPassPersonality(title)?.mascotSrc;
+}
+
+function shortFoodLabel(weirdCombination: string): string {
+  const first = weirdCombination.split("+")[0]?.trim();
+  if (!first) return "Snack energy";
+  return `${first} chaos`.slice(0, 16);
+}
+
+function memberNoFromName(name: string): string {
+  const seed = name.trim().toLowerCase() || "gradright";
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return String(1000 + (hash % 9000));
+}
+
+function resolvePersonalityId(responses: UserResponses): PassPersonalityId {
+  const blocker = responses.whatsStoppingYou.trim().toLowerCase();
+  const move = responses.nextBigMove.trim().toLowerCase();
+  const character = responses.bollywoodCharacter.toLowerCase();
+
+  if (
+    blocker.includes("too many options") ||
+    blocker.includes("scared of picking wrong")
+  ) {
+    return "certified-overthinker";
+  }
+
+  if (blocker.includes("don't know where to start") || blocker.includes("dont know where to start")) {
+    return "the-thorough-planner";
+  }
+
+  if (
+    character.includes("geet") ||
+    character.includes("bunny") ||
+    responses.superpower.toLowerCase().includes("read minds")
+  ) {
+    return "certified-yapper";
+  }
+
+  if (
+    move.includes("switch career") ||
+    move.includes("grow in my current") ||
+    blocker.includes("can't leave") ||
+    blocker.includes("cant leave")
+  ) {
+    return "the-never-settler";
+  }
+
+  if (blocker.includes("no time") || move.includes("going back to college")) {
+    return "the-thorough-planner";
+  }
+
+  return "certified-overthinker";
+}
+
+function missionFromMove(nextBigMove: string): string {
+  switch (nextBigMove) {
+    case "Grow in my current role":
+      return "Learn beside the job";
+    case "Switch career paths":
+      return "Find the next path";
+    case "Going back to college":
+      return "Back to learning";
+    default:
+      return "Level up online";
+  }
+}
+
+function matchFromMove(nextBigMove: string): string {
+  switch (nextBigMove) {
+    case "Grow in my current role":
+      return "Online programs";
+    case "Switch career paths":
+      return "Career-fit programs";
+    case "Going back to college":
+      return "Degree-ready programs";
+    default:
+      return "Online programs";
+  }
+}
+
+function strengthFromBlocker(blocker: string): string {
+  switch (blocker) {
+    case "Too many options":
+      return "Spirals first";
+    case "Scared of picking wrong":
+      return "Checks twice";
+    case "Don't know where to start":
+      return "Plans first";
+    case "No time":
+      return "Busy builder";
+    case "Can't leave my job":
+      return "Stays steady";
+    default:
+      return "Keeps going";
+  }
+}
+
+function blindSpotFromBlocker(blocker: string): string {
+  switch (blocker) {
+    case "Too many options":
+      return "Starts later";
+    case "Scared of picking wrong":
+      return "Hesitates";
+    case "Don't know where to start":
+      return "Over-preps";
+    case "No time":
+      return "Defers start";
+    case "Can't leave my job":
+      return "Stays put";
+    default:
+      return "Second-guesses";
+  }
+}
+
+function betterMoveFromAnswers(responses: UserResponses): string {
+  if (responses.nextBigMove === "Grow in my current role") return "Fit around job";
+  if (responses.nextBigMove === "Switch career paths") return "Try a new lane";
+  if (responses.nextBigMove === "Going back to college") return "Study smarter";
+  if (responses.whatsStoppingYou === "No time") return "Short bursts";
+  return "Start smaller";
+}
+
+/** Build Pass card content from the live quiz answers. */
+export function buildPassFromResponses(
+  responses: UserResponses | null | undefined,
+): PassCardContent {
+  if (!responses) return { ...PLACEHOLDER_PASS };
+
+  const personalityId = resolvePersonalityId(responses);
+  const personality = PASS_PERSONALITY_BY_ID[personalityId];
+  const displayName = responses.name.trim() || "Friend";
+
+  return {
+    personalityTitle: personality.title,
+    personalityRead: shortFoodLabel(responses.weirdCombination),
+    strength: strengthFromBlocker(responses.whatsStoppingYou),
+    blindSpot: blindSpotFromBlocker(responses.whatsStoppingYou),
+    mission: missionFromMove(responses.nextBigMove),
+    match: matchFromMove(responses.nextBigMove),
+    betterMove: betterMoveFromAnswers(responses),
+    name: displayName,
+    memberNo: memberNoFromName(displayName),
+    tagline: "Your GradRight personality",
+    personalityId,
+  };
 }

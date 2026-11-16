@@ -7,11 +7,13 @@ import { Poppins } from "next/font/google";
 import { useAppStoreUrl } from "@/hooks/useAppStoreUrl";
 import { trackAppDownloadClick } from "@/lib/track";
 import {
+  buildPassFromResponses,
   buildPassTraits,
-  PLACEHOLDER_PASS,
+  getPassPersonalityMascot,
   type PassMascotGender,
   type PassTraitIcon,
 } from "@/lib/pass-card";
+import type { UserResponses } from "@/lib/types";
 
 const passPoppins = Poppins({
   subsets: ["latin"],
@@ -213,11 +215,13 @@ function CountUpNo({ value }: { value: string }) {
 interface GradRightPassProps {
   trackLocation?: string;
   mascotGender?: PassMascotGender;
+  responses?: UserResponses | null;
 }
 
 export default function GradRightPass({
   trackLocation = "flow-2",
   mascotGender = "female",
+  responses = null,
 }: GradRightPassProps) {
   const appStoreUrl = useAppStoreUrl();
   const cardRef = useRef<HTMLElement>(null);
@@ -236,8 +240,10 @@ export default function GradRightPass({
   const reduceMotionRef = useRef(false);
   const sharePanelRef = useRef<HTMLDivElement>(null);
 
-  const pass = PLACEHOLDER_PASS;
+  const pass = buildPassFromResponses(responses);
   const traits = buildPassTraits(pass);
+  const mascotSrc =
+    getPassPersonalityMascot(pass.personalityTitle) ?? `${ASSET}/mascot-blob.svg`;
   void mascotGender;
 
   useFitText(titleRef, { maxPx: 35, minPx: 26 });
@@ -316,12 +322,12 @@ export default function GradRightPass({
   }, [trackLocation]);
 
   useEffect(() => {
-    if (!ready) {
-      setTiltReady(false);
-      return;
-    }
+    if (!ready) return;
     const t = window.setTimeout(() => setTiltReady(true), 820);
-    return () => window.clearTimeout(t);
+    return () => {
+      window.clearTimeout(t);
+      setTiltReady(false);
+    };
   }, [ready]);
 
   useEffect(() => {
@@ -645,7 +651,7 @@ export default function GradRightPass({
                 <div className="pass-mascot-glow" aria-hidden="true" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={`${ASSET}/mascot-blob.svg`}
+                  src={mascotSrc}
                   alt="GradRight pass mascot"
                   className="pass-mascot"
                   draggable={false}

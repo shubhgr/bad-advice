@@ -1,13 +1,14 @@
 "use client";
 
 import GradRightPass from "@/components/GradRightPass";
-import type { Course } from "@/lib/types";
+import type { Course, UserResponses } from "@/lib/types";
 
 interface Flow2AfterAdviceProps {
   aspirationalHeading?: string;
   advice?: string;
   programs: Course[];
   trackLocation?: string;
+  responses?: UserResponses | null;
 }
 
 /** After bad advice — goes straight to the GradRight Pass (no bridge screens). */
@@ -16,6 +17,7 @@ export default function Flow2AfterAdvice({
   advice: _advice,
   programs: _programs,
   trackLocation = "flow-2",
+  responses = null,
 }: Flow2AfterAdviceProps) {
   void _aspirationalHeading;
   void _advice;
@@ -33,7 +35,7 @@ export default function Flow2AfterAdvice({
         overflow: "hidden",
       }}
     >
-      <GradRightPass trackLocation={trackLocation} />
+      <GradRightPass trackLocation={trackLocation} responses={responses} />
     </section>
   );
 }

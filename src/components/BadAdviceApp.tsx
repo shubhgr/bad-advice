@@ -198,6 +198,7 @@ export default function BadAdviceApp() {
               advice={goodAdvice}
               programs={recommendations}
               trackLocation="main-flow-2"
+              responses={responses}
             />
           )}
         </main>
