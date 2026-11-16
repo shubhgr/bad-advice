@@ -62,6 +62,20 @@ export const WEIRD_COMBINATION_OPTIONS = [
   "Coke + Milk",
 ];
 
+export const NEXT_BIG_MOVE_OPTIONS = [
+  "Grow in my current role",
+  "Switch career paths",
+  "Going back to college",
+];
+
+export const WHATS_STOPPING_YOU_OPTIONS = [
+  "Don't know where to start",
+  "Too many options",
+  "No time",
+  "Can't leave my job",
+  "Scared of picking wrong",
+];
+
 export const AREA_TO_EXPLORE_OPTIONS = [
   "Business & Finance",
   "Marketing, HR & Ops",

@@ -17,7 +17,8 @@ function profileSummary(responses: UserResponses): string {
 
   return `Name: ${usableName ?? "(skip, no usable name)"}
 Current Situation: ${responses.careerStage}
-Learning Interest: ${responses.areaToExplore}
+Next Big Move: ${responses.nextBigMove}
+What's Stopping Them: ${responses.whatsStoppingYou}
 Bollywood Character: ${responses.bollywoodCharacter}
 Superpower: ${responses.superpower}
 Weird Food Combination: ${responses.weirdCombination}`;
@@ -360,7 +361,7 @@ Name, only if it's a real name, not a placeholder, can be used alongside the for
 
 BORING and GENERIC, weak on their own, side detail only, never the whole joke:
 Current Situation, like Student or Working Professional
-Learning Interest, business or course topics
+Next Big Move or What's Stopping Them, career intent topics
 
 USE ONLY THE FORCED ANCHOR FIELD FOR THIS JOKE.
 Do not reference any other weird quiz answer in this response. If you drift off ${forcedAnchor} or invent a different quiz option than ${userValue}, your answer is invalid. Discard and rewrite around ${userValue} only.
@@ -712,7 +713,8 @@ function validateResponses(responses: UserResponses): boolean {
       responses.bollywoodCharacter.trim() &&
       responses.superpower &&
       responses.weirdCombination &&
-      responses.areaToExplore
+      responses.nextBigMove &&
+      responses.whatsStoppingYou
   );
 }
 

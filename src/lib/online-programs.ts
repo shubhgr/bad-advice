@@ -158,3 +158,30 @@ export function getProgramsForArea(areaToExplore: string): Course[] {
     .slice(0, MAX_RECOMMENDATIONS)
     .map((program) => toCourse(program));
 }
+
+/** Mixed recommendations when the quiz no longer collects a learning field. */
+export function getMixedPrograms(): Course[] {
+  const areas = Object.keys(AREA_TO_AOS_MAP);
+  const pools = areas.map((area) => getProgramsForArea(area));
+  const mixed: Course[] = [];
+  const seen = new Set<string>();
+  let index = 0;
+
+  while (mixed.length < MAX_RECOMMENDATIONS) {
+    let added = false;
+
+    for (const pool of pools) {
+      const program = pool[index];
+      if (!program || seen.has(program.id)) continue;
+      mixed.push(program);
+      seen.add(program.id);
+      added = true;
+      if (mixed.length >= MAX_RECOMMENDATIONS) break;
+    }
+
+    if (!added) break;
+    index += 1;
+  }
+
+  return mixed;
+}

@@ -2,10 +2,11 @@
 
 import { FormEvent, useState } from "react";
 import {
-  AREA_TO_EXPLORE_OPTIONS,
   BOLLYWOOD_CHARACTERS,
+  NEXT_BIG_MOVE_OPTIONS,
   SUPERPOWER_OPTIONS,
   WEIRD_COMBINATION_OPTIONS,
+  WHATS_STOPPING_YOU_OPTIONS,
 } from "@/data/questionnaire";
 import { EMPTY_RESPONSES, UserResponses } from "@/lib/types";
 import StepProgress from "@/components/StepProgress";
@@ -74,9 +75,15 @@ const STEPS: StepConfig[] = [
   },
   {
     kind: "choice",
-    field: "areaToExplore",
-    label: "Pick the field that gives your brain cells a little dopamine hit.",
-    options: AREA_TO_EXPLORE_OPTIONS,
+    field: "nextBigMove",
+    label: "What's your next big move?",
+    options: NEXT_BIG_MOVE_OPTIONS,
+  },
+  {
+    kind: "choice",
+    field: "whatsStoppingYou",
+    label: "And what's stopping you?",
+    options: WHATS_STOPPING_YOU_OPTIONS,
   },
 ];
 
@@ -195,29 +202,26 @@ export default function Questionnaire({ onSubmit }: QuestionnaireProps) {
 
           {currentStep.kind === "choice" && (
             <div className="option-step">
-              <div
-                className={`option-grid ${
-                  currentStep.field === "areaToExplore"
-                    ? "area-category-grid"
-                    : ""
-                }`}
-              >
-                {currentStep.options.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() =>
-                      handleChoiceSelect(currentStep.field, option)
-                    }
-                    className={`option-button ${
-                      currentStep.field === "areaToExplore"
-                        ? "area-category-button"
-                        : ""
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
+              <div className="option-grid">
+                {currentStep.options.map((option, index) => {
+                  const isFullWidth =
+                    (currentStep.field === "whatsStoppingYou" && index === 0) ||
+                    (currentStep.field === "nextBigMove" &&
+                      index === currentStep.options.length - 1);
+
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() =>
+                        handleChoiceSelect(currentStep.field, option)
+                      }
+                      className={`option-button${isFullWidth ? " option-button-full" : ""}`}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

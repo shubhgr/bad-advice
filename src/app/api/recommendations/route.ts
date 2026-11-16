@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getProgramsForArea } from "@/lib/online-programs";
+import { getMixedPrograms } from "@/lib/online-programs";
 import { UserResponses } from "@/lib/types";
 
 export async function POST(request: NextRequest) {
   try {
     const responses: UserResponses = await request.json();
 
-    if (!responses.areaToExplore?.trim()) {
+    if (!responses.nextBigMove?.trim() || !responses.whatsStoppingYou?.trim()) {
       return NextResponse.json(
-        { error: "Please select an area to explore" },
+        { error: "Please complete all questions" },
         { status: 400 }
       );
     }
 
-    const recommendations = getProgramsForArea(responses.areaToExplore);
+    const recommendations = getMixedPrograms();
 
     return NextResponse.json({ recommendations });
   } catch (error) {

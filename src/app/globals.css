@@ -1456,6 +1456,10 @@ select.input-field {
   width: 100%;
 }
 
+.option-grid > .option-button-full {
+  grid-column: 1 / -1;
+}
+
 .option-button {
   width: 100%;
   min-height: 52px;

@@ -4,7 +4,8 @@ export interface UserResponses {
   bollywoodCharacter: string;
   superpower: string;
   weirdCombination: string;
-  areaToExplore: string;
+  nextBigMove: string;
+  whatsStoppingYou: string;
 }
 
 export interface Course {
@@ -28,5 +29,6 @@ export const EMPTY_RESPONSES: UserResponses = {
   bollywoodCharacter: "",
   superpower: "",
   weirdCombination: "",
-  areaToExplore: "",
+  nextBigMove: "",
+  whatsStoppingYou: "",
 };

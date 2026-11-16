@@ -28,7 +28,8 @@ function profileSummary(responses: UserResponses): string {
 
   return `Name: ${usableName ?? "(skip, no usable name)"}
 Current Situation: ${responses.careerStage}
-Learning Interest: ${responses.areaToExplore}
+Next Big Move: ${responses.nextBigMove}
+What's Stopping Them: ${responses.whatsStoppingYou}
 Bollywood Character: ${responses.bollywoodCharacter}
 Superpower: ${responses.superpower}
 Weird Food Combination: ${responses.weirdCombination}`;
@@ -41,11 +42,11 @@ USER DATA:
 ${profileSummary(responses)}
 
 GOAL:
-Write a short, warm sentence or two that makes the user feel genuinely seen, then naturally guides them toward exploring their stated Learning Interest (${responses.areaToExplore}). This is a soft transition into showing them real course or program recommendations, so end in a way that makes sense right before a list of programs appears, without literally saying the list is coming.
+Write a short, warm sentence or two that makes the user feel genuinely seen, then naturally guides them toward their next big move (${responses.nextBigMove}) while acknowledging what's stopping them (${responses.whatsStoppingYou}). This is a soft transition into showing them real course or program recommendations, so end in a way that makes sense right before a list of programs appears, without literally saying the list is coming.
 
 HOW TO USE THE FIELDS:
-Learning Interest and Current Situation are the fields that matter most here, this is genuine advice, so it should be grounded in what they actually said they want to explore and where they currently are in life.
-Bollywood Character, Superpower, and Weird Food Combination are optional, only use one if it can be woven in briefly and naturally as a warm personality note, not as the center of the advice. Given how short this text now is, it is often better to skip them entirely and just focus on Learning Interest and Current Situation.
+Next Big Move, What's Stopping Them, and Current Situation are the fields that matter most here, this is genuine advice, so it should be grounded in what they want next, what is blocking them, and where they currently are in life.
+Bollywood Character, Superpower, and Weird Food Combination are optional, only use one if it can be woven in briefly and naturally as a warm personality note, not as the center of the advice. Given how short this text now is, it is often better to skip them entirely and just focus on Next Big Move, What's Stopping Them, and Current Situation.
 
 Do NOT reach for a strained connection between a fun quiz answer and their life path just to use the data. If a Bollywood character or superpower does not add real warmth or a genuine, on the nose connection, leave it out completely.
 
@@ -56,7 +57,7 @@ STRICT RULES:
 1. Start with their name if present and not a placeholder like "friend," "user," or random letters. If no valid name, skip straight into the advice with zero direct address.
 2. STRICTLY 1 to 2 sentences only. This must be short and punchy, not a paragraph. Every word must earn its place.
 3. Do not use the dash or hyphen character anywhere in the output. Use commas or periods instead.
-4. Must reference their Learning Interest by its actual value, not a vague paraphrase.
+4. Must reference their Next Big Move by its actual value, not a vague paraphrase. Optionally acknowledge What's Stopping Them if it fits naturally.
 5. Do not include any joke, sarcasm, roast, or absurd logic, this is not the bad advice screen.
 6. Do not literally say things like "here are some programs" or "check out these courses," that list appears separately below your text, just end in a way that naturally leads into it.
 7. Output ONLY the advice text in the "advice" field. No quotes around it, no markdown, no preamble, no meta commentary.
@@ -79,8 +80,8 @@ BAD EXAMPLES, what NOT to do:
 "Riya, moving from a computer science background into Data and AI is a smart shift, the analytical thinking you already have gives you a real head start. As a working professional, you do not need to start from zero, you need focused, practical learning that fits around your schedule. This next step could genuinely open doors you have not considered yet." Too long for this shorter format, should be trimmed to one or two sentences.
 
 HEADLINE RULES:
-Also write a short, genuine, encouraging headline for the top of the card, 2 to 5 words, related to their Learning Interest. Should sound like a real section title, not a joke and not a question.
-Examples: "Data Analytics Ahead", "Your Path Into Design", "Business Skills Start Here"
+Also write a short, genuine, encouraging headline for the top of the card, 2 to 5 words, related to their Next Big Move. Should sound like a real section title, not a joke and not a question.
+Examples: "Level Up Ahead", "Career Switch Ahead", "Back to Learning Ahead"
 
 Output as JSON only, with exactly these keys:
 {"headline":"your short genuine headline","advice":"the short genuine advice text"}`;
@@ -155,22 +156,26 @@ function soundsInvalidGoodAdvice(text: string): boolean {
 }
 
 function getFallbackHeadline(responses: UserResponses): string {
-  const area = responses.areaToExplore?.trim() || "Your Goals";
-  const shortArea = area.split(/\s+/).slice(0, 3).join(" ");
-  return `${shortArea} Ahead`;
+  const move = responses.nextBigMove?.trim() || "Your Next Move";
+  if (move === "Grow in my current role") return "Level Up Ahead";
+  if (move === "Switch career paths") return "Career Switch Ahead";
+  if (move === "Going back to college") return "Back to Learning Ahead";
+  const shortMove = move.split(/\s+/).slice(0, 3).join(" ");
+  return `${shortMove} Ahead`;
 }
 
 function getFallbackGoodAdvice(responses: UserResponses): GoodAdviceResult {
   const name = getUsableName(responses.name);
-  const area = responses.areaToExplore || "your chosen field";
+  const move = responses.nextBigMove || "your next move";
+  const blocker = responses.whatsStoppingYou || "uncertainty";
   const stage = responses.careerStage || "where you are now";
   const isStudent =
     stage.toLowerCase().includes("student") ||
     stage.toLowerCase().includes("studying");
 
   const body = isStudent
-    ? `As a student, now is the best possible time to build real skills in ${area}, before the pressure of a full time job kicks in.`
-    : `Exploring ${area} from ${stage.toLowerCase()} is a genuinely good instinct, and focused practical learning is exactly what will open the next door.`;
+    ? `As a student, wanting to ${move.toLowerCase()} is a strong instinct, and feeling stuck by "${blocker.toLowerCase()}" is exactly why focused practical learning can help right now.`
+    : `Wanting to ${move.toLowerCase()} from ${stage.toLowerCase()} is a genuinely good instinct, and feeling held back by "${blocker.toLowerCase()}" is exactly where focused practical learning can open the next door.`;
 
   const advice = name ? `${name}, ${body.charAt(0).toLowerCase()}${body.slice(1)}` : body;
 
@@ -270,7 +275,8 @@ function validateResponses(responses: UserResponses): boolean {
       responses.bollywoodCharacter.trim() &&
       responses.superpower &&
       responses.weirdCombination &&
-      responses.areaToExplore
+      responses.nextBigMove &&
+      responses.whatsStoppingYou
   );
 }
 
