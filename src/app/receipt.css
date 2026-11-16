@@ -1,0 +1,682 @@
+/* Bad Advice Department — single-viewport receipt */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.bad-receipt-screen {
+  --bad-bg: #0a0a0f;
+  --bad-purple-cta: #6a2cf5;
+  --bad-lime-a: #a8e05a;
+  --bad-lime-b: #8ccb3f;
+  --bad-badge: #3a2a7a;
+  --bad-badge-text: #cdb8ff;
+  --bad-border: rgba(255, 255, 255, 0.12);
+  --bad-text: #ffffff;
+  --bad-paper: #f6f1e7;
+  --bad-ink: #17131f;
+  --bad-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --bad-print-ease: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* Height budget of the screen (of available content box) */
+  --bad-printer-h: 8%;
+  --bad-coupon-h: 11%;
+  --bad-cta-h: 16%;
+  --bad-gap: 2%;
+
+  container-type: size;
+  container-name: bad-receipt;
+
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: min(100%, 400px);
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  margin: 0 auto;
+  padding:
+    max(6px, env(safe-area-inset-top, 0px))
+    14px
+    max(8px, env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  gap: 0.6%;
+  background:
+    radial-gradient(90% 50% at 50% 100%, rgba(75, 43, 168, 0.5) 0%, transparent 70%),
+    radial-gradient(70% 36% at 50% 0%, rgba(43, 26, 102, 0.32) 0%, transparent 65%),
+    var(--bad-bg);
+  overflow: hidden;
+}
+
+.bad-receipt-machine {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 var(--bad-printer-h);
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  min-height: 18px;
+  max-height: 36px;
+  padding: 0 6px;
+  box-sizing: border-box;
+}
+
+.bad-receipt-machine-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 18px;
+  border: 1px solid var(--bad-border);
+  border-radius: 12px 12px 8px 8px;
+  background: linear-gradient(180deg, #3a246e 0%, #1a1038 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 8px 18px rgba(0, 0, 0, 0.4);
+}
+
+.bad-receipt-machine-light {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--bad-lime-a);
+  box-shadow: 0 0 8px rgba(168, 224, 90, 0.75);
+  transform: translateY(-50%);
+}
+
+.bad-receipt-screen:not(.is-printed) .bad-receipt-machine-light {
+  animation: bad-receipt-light-pulse 520ms ease-in-out infinite alternate;
+}
+
+.bad-receipt-machine-slot {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 4px;
+  height: 4px;
+  border-radius: 3px;
+  background: #050308;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.7),
+    0 0 10px rgba(168, 224, 90, 0.22);
+}
+
+/* Receipt + coupon share one flex region (~66%: 55% paper + 11% coupon) */
+.bad-receipt-stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 66%;
+  margin-top: -4px;
+}
+
+.bad-receipt-feed {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.bad-receipt-paper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  color: var(--bad-ink);
+  background: var(--bad-paper);
+  border-radius: 0 0 4px 4px;
+  padding: clamp(6px, 1.4cqi, 10px) clamp(8px, 2.2cqi, 12px) 0;
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.38),
+    inset 0 0 0 1px rgba(23, 19, 31, 0.06);
+  animation: bad-receipt-print 1.9s var(--bad-print-ease) 120ms both;
+  transform-origin: top center;
+  overflow: hidden;
+}
+
+.bad-receipt-screen.is-printed .bad-receipt-paper {
+  animation: none;
+}
+
+.bad-receipt-paper::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  background:
+    radial-gradient(circle at 5px 0, transparent 4.5px, var(--bad-paper) 5px) 0 0 / 10px 6px
+      repeat-x;
+  transform: translateY(-5px);
+  pointer-events: none;
+}
+
+.bad-receipt-header {
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.bad-receipt-dept {
+  margin: 0;
+  font-size: clamp(0.55rem, 2.1cqi, 0.68rem);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bad-ink);
+}
+
+.bad-receipt-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 3px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(0.5rem, 1.8cqi, 0.58rem);
+  color: rgba(23, 19, 31, 0.58);
+}
+
+.bad-receipt-tagline {
+  margin: 2px 0 0;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(0.48rem, 1.7cqi, 0.56rem);
+  color: rgba(23, 19, 31, 0.5);
+}
+
+.bad-receipt-illustration {
+  display: block;
+  flex-shrink: 1;
+  width: min(100%, 170px);
+  height: auto;
+  max-height: 9cqh;
+  margin: 4px auto 0;
+}
+
+.bad-receipt-dash {
+  flex-shrink: 0;
+  height: 1px;
+  margin: 5px 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(23, 19, 31, 0.32) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.bad-receipt-block {
+  flex-shrink: 1;
+  min-height: 0;
+  margin: 0 0 4px;
+}
+
+.bad-receipt-label {
+  margin: 0;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(0.45rem, 1.55cqi, 0.52rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(23, 19, 31, 0.48);
+}
+
+.bad-receipt-title {
+  margin: 1px 0 0;
+  font-size: clamp(0.95rem, 4.4cqi, 1.25rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--bad-purple-cta);
+}
+
+.bad-receipt-value {
+  margin: 1px 0 0;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(0.58rem, 2.1cqi, 0.7rem);
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--bad-ink);
+}
+
+.bad-receipt-traits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 0 0 4px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(0.55rem, 1.95cqi, 0.66rem);
+  line-height: 1.25;
+  color: var(--bad-ink);
+}
+
+.bad-receipt-traits p {
+  margin: 0;
+}
+
+.bad-receipt-inline-label {
+  display: block;
+  margin-bottom: 1px;
+  font-size: 0.85em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(23, 19, 31, 0.48);
+}
+
+.bad-receipt-match {
+  margin: 1px 0 0;
+  font-size: clamp(0.7rem, 2.5cqi, 0.85rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--bad-ink);
+}
+
+.bad-receipt-match-block {
+  margin-bottom: 2px;
+}
+
+.bad-receipt-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  margin-top: auto;
+  padding-top: 2px;
+  text-align: center;
+}
+
+.bad-receipt-thanks {
+  margin: 0;
+  font-family: var(--font-hand), cursive;
+  font-size: clamp(0.95rem, 3.4cqi, 1.2rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--bad-ink);
+}
+
+.bad-receipt-total {
+  margin: 0;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(0.58rem, 2cqi, 0.7rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.bad-receipt-total span {
+  background: linear-gradient(90deg, var(--bad-lime-a), var(--bad-lime-b));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bad-receipt-barcode {
+  display: block;
+  width: 88px;
+  height: 12px;
+  margin: 2px auto 0;
+  color: var(--bad-ink);
+}
+
+.bad-receipt-perforation {
+  flex-shrink: 0;
+  height: 10px;
+  margin: 4px -2px 0;
+  background:
+    radial-gradient(circle at 5px 50%, transparent 3.6px, var(--bad-paper) 4px) 0 0 / 10px 10px
+      repeat-x;
+  border-top: 1px dashed rgba(23, 19, 31, 0.28);
+}
+
+.bad-receipt-coupon {
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 0;
+  max-height: 22%;
+  margin-top: -1px;
+  padding: 5px 8px 6px;
+  text-align: center;
+  background: rgba(106, 44, 245, 0.06);
+  border: 1px dashed rgba(106, 44, 245, 0.35);
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
+}
+
+.bad-receipt-coupon-title {
+  margin: 0;
+  font-size: clamp(0.95rem, 4cqi, 1.2rem);
+  font-weight: 950;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--bad-ink);
+}
+
+.bad-receipt-coupon-title span {
+  background: linear-gradient(180deg, var(--bad-lime-a), var(--bad-lime-b));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bad-receipt-coupon-sub {
+  margin: 2px 0 0;
+  font-size: clamp(0.58rem, 2cqi, 0.72rem);
+  font-weight: 650;
+  color: rgba(23, 19, 31, 0.7);
+}
+
+.bad-receipt-coupon-code-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+  min-height: 28px;
+}
+
+.bad-receipt-coupon-code {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid rgba(23, 19, 31, 0.12);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(0.65rem, 2.3cqi, 0.8rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--bad-purple-cta);
+}
+
+.bad-receipt-coupon-code.is-locked {
+  filter: blur(4px);
+  user-select: none;
+  opacity: 0.85;
+}
+
+.bad-receipt-lock {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bad-badge);
+  color: var(--bad-badge-text);
+}
+
+.bad-receipt-copy-btn {
+  padding: 5px 8px;
+  border: 1px solid rgba(106, 44, 245, 0.35);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--bad-purple-cta);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bad-receipt-copy-btn:focus-visible,
+.bad-receipt-primary:focus-visible,
+.bad-receipt-secondary:focus-visible {
+  outline: 2px solid var(--bad-lime-a);
+  outline-offset: 2px;
+}
+
+.bad-receipt-coupon.is-unlocked {
+  animation: bad-receipt-tear 380ms var(--bad-ease) both;
+}
+
+.bad-receipt-confetti {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.bad-receipt-confetti > span {
+  position: absolute;
+  top: 42%;
+  left: calc(18% + (5.5% * var(--i)));
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--bad-lime-a);
+  animation: bad-receipt-confetti 720ms var(--bad-ease) both;
+  animation-delay: calc(16ms * var(--i));
+}
+
+.bad-receipt-confetti > span:nth-child(odd) {
+  background: var(--bad-purple-cta);
+  border-radius: 50%;
+}
+
+.bad-receipt-actions {
+  z-index: 4;
+  display: flex;
+  flex: 0 0 var(--bad-cta-h);
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  min-height: 0;
+  max-height: 120px;
+  padding-top: 4px;
+  box-sizing: border-box;
+}
+
+.bad-receipt-primary {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  max-height: 56px;
+  padding: 6px 12px;
+  border-radius: 0;
+  background: #ffffff;
+  color: var(--bad-purple-cta);
+  font-size: clamp(0.92rem, 3.4cqi, 1.02rem);
+  font-weight: 800;
+  line-height: 1.1;
+  text-decoration: none;
+  box-shadow: 0 0 20px rgba(106, 44, 245, 0.24);
+}
+
+.bad-receipt-primary-sub {
+  margin-top: 1px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(106, 44, 245, 0.68);
+}
+
+.bad-receipt-primary:active,
+.bad-receipt-secondary:active {
+  transform: scale(0.98);
+}
+
+.bad-receipt-secondary {
+  flex: 0 0 auto;
+  min-height: 36px;
+  max-height: 42px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 0;
+  background: transparent;
+  color: var(--bad-text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.bad-receipt-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.bad-receipt-secondary[aria-busy="true"] {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+/* Short phones: shrink then hide illustration before text */
+@container bad-receipt (max-height: 700px) {
+  .bad-receipt-illustration {
+    max-height: 6cqh;
+    width: min(100%, 140px);
+  }
+}
+
+@container bad-receipt (max-height: 640px) {
+  .bad-receipt-illustration {
+    display: none;
+  }
+
+  .bad-receipt-dash {
+    margin: 3px 0;
+  }
+
+  .bad-receipt-block {
+    margin-bottom: 2px;
+  }
+}
+
+@keyframes bad-receipt-print {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0.95;
+  }
+  20% {
+    transform: translateY(-72%) translateX(0.3px);
+  }
+  24% {
+    transform: translateY(-72%) translateX(-0.3px);
+  }
+  55% {
+    transform: translateY(-28%);
+  }
+  88% {
+    transform: translateY(3px);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bad-receipt-light-pulse {
+  from {
+    box-shadow: 0 0 5px rgba(168, 224, 90, 0.3);
+  }
+  to {
+    box-shadow: 0 0 12px rgba(168, 224, 90, 0.9);
+  }
+}
+
+@keyframes bad-receipt-tear {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(2px) rotate(-0.3deg);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes bad-receipt-confetti {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-28px) rotate(110deg) scale(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bad-receipt-paper {
+    animation: bad-receipt-fade 240ms ease both;
+  }
+
+  .bad-receipt-screen:not(.is-printed) .bad-receipt-machine-light,
+  .bad-receipt-coupon.is-unlocked,
+  .bad-receipt-confetti > span {
+    animation: none;
+  }
+}
+
+@keyframes bad-receipt-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .bad-receipt-paper,
+  .bad-receipt-paper * {
+    visibility: visible !important;
+  }
+
+  .bad-receipt-paper {
+    position: absolute !important;
+    left: 50% !important;
+    top: 10mm !important;
+    transform: translateX(-50%) !important;
+    width: 80mm !important;
+    height: auto !important;
+    max-height: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .bad-receipt-illustration {
+    display: block !important;
+    filter: grayscale(1);
+    max-height: none;
+  }
+
+  .bad-receipt-actions,
+  .bad-receipt-machine,
+  .bad-receipt-copy-btn,
+  .bad-receipt-confetti {
+    display: none !important;
+  }
+
+  .bad-receipt-coupon-code.is-locked {
+    filter: none !important;
+  }
+
+  @page {
+    margin: 10mm;
+  }
+}

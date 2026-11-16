@@ -1,0 +1,1044 @@
+/* GradRight Pass — dark-glass editorial (332 wide, height hugs content) */
+
+.pass-screen {
+  --ink-100: #ffffff;
+  --ink-200: rgba(255, 255, 255, 0.78);
+  --ink-300: rgba(255, 255, 255, 0.58);
+  --glass-fill: rgba(255, 255, 255, 0.08);
+  --glass-fill-strong: rgba(255, 255, 255, 0.14);
+  --glass-line: rgba(255, 255, 255, 0.22);
+  --v900: #22115a;
+  --v800: #321a7a;
+  --v600: #5b36c7;
+  --v500: #7650e0;
+  --orchid: #b04fd6;
+  --pink: #e86bb8;
+  --plum: #1b0e4a;
+  --lime: #a8e05a;
+  --pass-cta: #6a2cf5;
+  --pass-display: var(--font-pass-display), "Grotap", "Arial Narrow", sans-serif;
+  --pass-sans: var(--font-pass-sans), "DM Sans", system-ui, sans-serif;
+  --pass-dot: var(--font-pass-dot), "Doto", "DotGothic16", monospace;
+  --pass-cta-font: var(--font-pass-cta), "Poppins", system-ui, sans-serif;
+  --pass-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0 auto;
+  padding:
+    max(8px, env(safe-area-inset-top, 0px))
+    12px
+    max(16px, env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  gap: 16px;
+  background: transparent;
+  overflow: hidden;
+}
+
+.pass-stage {
+  position: relative;
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  overflow: visible;
+  padding-block: 0;
+}
+
+.pass-halo {
+  display: none;
+}
+
+.pass-card-wrap {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  position: relative;
+  z-index: 1;
+  perspective: 1100px;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 24px 40px rgba(34, 17, 90, 0.55));
+  transition: filter 220ms var(--pass-ease);
+}
+
+.pass-card-wrap.is-tilt-ready:hover {
+  filter: drop-shadow(0 28px 48px rgba(34, 17, 90, 0.62));
+}
+
+.pass-card {
+  position: relative;
+  isolation: isolate;
+  width: 332px;
+  height: auto;
+  max-width: 100%;
+  max-height: none;
+  padding: 20px 20px 24px;
+  box-sizing: border-box;
+  border-radius: 40px;
+  color: var(--ink-100);
+  overflow: hidden;
+  /* Mesh gradient base */
+  background:
+    linear-gradient(180deg, transparent 48%, rgba(21, 10, 58, 0.72) 72%, rgba(21, 10, 58, 0.88) 100%),
+    radial-gradient(260px 260px at 12% 8%, rgba(118, 80, 224, 0.7), transparent 70%),
+    radial-gradient(240px 240px at 88% 42%, rgba(176, 79, 214, 0.55), transparent 70%),
+    radial-gradient(280px 280px at 55% 88%, rgba(232, 107, 184, 0.6), transparent 70%),
+    radial-gradient(260px 260px at 8% 78%, rgba(68, 37, 163, 0.8), transparent 70%),
+    var(--plum);
+  /* Soft glass edge */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.12);
+  /* Ticket notches at 46% height */
+  -webkit-mask-image:
+    radial-gradient(circle 14px at -2px 46%, transparent 13.5px, #000 14px),
+    radial-gradient(circle 14px at calc(100% + 2px) 46%, transparent 13.5px, #000 14px);
+  mask-image:
+    radial-gradient(circle 14px at -2px 46%, transparent 13.5px, #000 14px),
+    radial-gradient(circle 14px at calc(100% + 2px) 46%, transparent 13.5px, #000 14px);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  opacity: 0;
+  transform: scale(0.94) translateY(14px);
+  transform-origin: center center;
+  transition: transform 160ms ease-out;
+  will-change: transform;
+}
+
+.pass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0.08) 48%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
+  opacity: 0.18;
+  mix-blend-mode: soft-light;
+}
+
+/* Dot wallpaper — crisp, masked away from mascot center */
+.pass-dots {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle 0.8px,
+    rgba(255, 255, 255, 0.22) 99%,
+    transparent 100%
+  );
+  background-size: 10px 10px;
+  background-position: 0 0;
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 55% at 50% 42%,
+    transparent 20%,
+    rgba(0, 0, 0, 0.55) 55%,
+    #000 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 70% 55% at 50% 42%,
+    transparent 20%,
+    rgba(0, 0, 0, 0.55) 55%,
+    #000 100%
+  );
+}
+
+/* Slow mesh drift (transform only) */
+.pass-mesh {
+  position: absolute;
+  inset: -12%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(240px 240px at 30% 20%, rgba(118, 80, 224, 0.45), transparent 70%),
+    radial-gradient(220px 220px at 70% 60%, rgba(232, 107, 184, 0.35), transparent 70%);
+  filter: blur(60px);
+  will-change: transform;
+}
+
+.pass-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: soft-light;
+}
+
+.pass-screen.is-ready .pass-card {
+  animation: pass-card-in 780ms var(--pass-ease) both;
+}
+
+.pass-screen.is-ready .pass-mesh {
+  animation: pass-mesh-drift 30s linear infinite;
+}
+
+/* Pointer tilt — applied after enter animation settles */
+.pass-screen.is-ready .pass-card-wrap.is-tilt-ready .pass-card {
+  animation: none;
+  opacity: 1;
+  transform:
+    perspective(1100px)
+    rotateX(var(--tilt-x))
+    rotateY(var(--tilt-y))
+    translate3d(0, 0, 0);
+}
+
+.pass-screen.is-ready .pass-card-wrap.is-tilt-ready:hover .pass-card {
+  transition-duration: 80ms;
+}
+
+.pass-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 0;
+  gap: 0;
+}
+
+/* Reserved mid band for the absolute mascot — keeps lower stack from colliding */
+.pass-mid-spacer {
+  flex: 0 0 auto;
+  height: 136px;
+  min-height: 136px;
+  pointer-events: none;
+}
+
+/* —— Top row —— */
+.pass-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.pass-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass-fill);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 6px 16px rgba(21, 10, 58, 0.35);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-family: var(--pass-sans);
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--ink-100);
+  white-space: nowrap;
+}
+
+.pass-brand-pill {
+  gap: 7px;
+  padding: 0 11px 0 10px;
+}
+
+.pass-brand-logo {
+  display: block;
+  width: 78px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.pass-brand-pass {
+  font-family: var(--pass-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-100);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .pass-glass {
+    background: var(--glass-fill-strong);
+  }
+}
+
+.pass-member {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--pass-dot);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--ink-200);
+}
+
+.pass-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lime);
+  box-shadow: 0 0 10px rgba(168, 224, 90, 0.7);
+}
+
+.pass-screen.is-ready .pass-live-dot {
+  animation: pass-dot-pulse 2.4s ease-in-out infinite;
+}
+
+.pass-member-no {
+  display: inline-block;
+  min-width: 4.2ch;
+  font-variant-numeric: tabular-nums;
+}
+
+/* —— Title —— */
+.pass-title-block {
+  position: relative;
+  z-index: 3;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  margin-inline: auto;
+  flex-shrink: 0;
+  max-width: 92%;
+  text-align: center;
+}
+
+.pass-headline {
+  margin: 0;
+  max-width: 100%;
+  font-family: var(--pass-display);
+  font-size: 35px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 1.22;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-100);
+  text-wrap: balance;
+}
+
+.pass-tagline {
+  position: relative;
+  z-index: 3;
+  margin: 10px 0 0;
+  font-family: var(--pass-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-200);
+  text-align: center;
+  white-space: nowrap;
+  overflow: visible;
+  text-shadow: 0 1px 12px rgba(27, 14, 74, 0.85);
+}
+
+/* —— Mascot —— */
+/* Blob −20% (61% / 152px), soft vignette + bottom dissolve into the plum zone */
+.pass-mascot-zone {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 168px;
+  height: 137px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pass-mascot-glow {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 61%;
+  height: 63%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse at 50% 45%,
+      rgba(190, 153, 255, 0.45) 0%,
+      rgba(148, 97, 253, 0.32) 38%,
+      transparent 70%
+    );
+  filter: blur(22px);
+  pointer-events: none;
+}
+
+.pass-mascot {
+  position: relative;
+  z-index: 1;
+  width: 55%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  filter:
+    drop-shadow(0 0 14px rgba(190, 153, 255, 0.35))
+    drop-shadow(0 10px 24px rgba(27, 14, 74, 0.45));
+}
+
+/* —— Details ——
+   Clear of mascot fade; space groups NAME → MISSION|MATCH → pills. */
+.pass-details {
+  position: relative;
+  z-index: 2;
+  margin-top: 8px;
+  padding-top: 4px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  text-align: center;
+}
+
+.pass-detail-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0;
+  min-width: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.pass-details > .pass-detail-row:first-child {
+  gap: 0;
+}
+
+.pass-details > .pass-detail-row:first-child .pass-detail-value.is-name {
+  margin-top: -2px;
+}
+
+.pass-details > .pass-detail-row:first-child .pass-name-line {
+  margin-top: 2px;
+}
+
+.pass-detail-label {
+  display: block;
+  font-family: var(--pass-sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-300);
+  text-align: center;
+}
+
+.pass-detail-value {
+  margin: 0;
+  font-family: var(--font-pass-cta), "Poppins", system-ui, sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--ink-100);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-align: center;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+}
+
+.pass-detail-clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+  word-break: normal;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pass-detail-value.is-name {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+  clip-path: none !important;
+}
+
+.pass-detail-value.is-name .pass-detail-clamp {
+  /* Long compound surnames need a third line more often than titles */
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.pass-detail-value.is-mission,
+.pass-detail-value.is-match {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+
+.pass-name-line {
+  display: block;
+  width: min(56%, 140px);
+  height: 1.5px;
+  margin: 2px auto 0;
+  border: 0;
+  background: linear-gradient(90deg, var(--orchid), var(--pink));
+}
+
+.pass-detail-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px 16px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.pass-detail-pair .pass-detail-row {
+  padding: 0;
+  border: 0;
+}
+
+/* —— Pills —— */
+.pass-pills {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+/* Last line — Poppins at extreme bottom (+20px card height kept; 8px bottom pad) */
+.pass-footer-note {
+  margin: 28px 0 0;
+  padding: 0 4px;
+  flex-shrink: 0;
+  font-family: var(--font-pass-cta), "Poppins", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  text-align: center;
+  color: var(--ink-200);
+}
+
+.pass-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  height: auto;
+  padding: 8px 10px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass-fill);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 6px 14px rgba(21, 10, 58, 0.35);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-family: var(--pass-sans);
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--ink-100);
+  min-width: 0;
+}
+
+.pass-pill span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pass-pill-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  opacity: 0.9;
+}
+
+/* —— Enter animations —— */
+.pass-screen.is-ready .pass-headline,
+.pass-screen.is-ready .pass-tagline {
+  animation: pass-fade-up 520ms var(--pass-ease) both;
+}
+
+.pass-screen.is-ready .pass-tagline {
+  animation-delay: 80ms;
+}
+
+.pass-screen.is-ready .pass-mascot {
+  animation: pass-mascot-in 700ms var(--pass-ease) 120ms both;
+}
+
+.pass-screen.is-ready .pass-details .pass-detail-row:first-child .pass-detail-value {
+  /* fade/slide only — clip-path write-on fights line-clamp on long names */
+  animation: pass-fade-up 500ms var(--pass-ease) 220ms both;
+}
+
+.pass-screen.is-ready .pass-name-line {
+  transform-origin: center center;
+  animation: pass-underline 480ms var(--pass-ease) 420ms both;
+}
+
+.pass-screen.is-ready .pass-detail-pair {
+  animation: pass-fade-up 480ms var(--pass-ease) 320ms both;
+}
+
+.pass-screen.is-ready .pass-pill {
+  animation: pass-pill-pop 520ms var(--pass-ease) both;
+}
+
+.pass-screen.is-ready .pass-pill:nth-child(1) { animation-delay: 380ms; }
+.pass-screen.is-ready .pass-pill:nth-child(2) { animation-delay: 440ms; }
+.pass-screen.is-ready .pass-pill:nth-child(3) { animation-delay: 500ms; }
+.pass-screen.is-ready .pass-pill:nth-child(4) { animation-delay: 560ms; }
+
+/* Export mode — screenshot-friendly (transparent canvas, embeddable fonts) */
+.pass-card.is-exporting {
+  /* Keep ticket notches; transparent PNG bg shows through cutouts */
+  /* Base .pass-card is opacity:0 until enter animation — keep it visible for capture */
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+  filter: none !important;
+  /* Keep real faces: Grotap display + Poppins UI (OTF served via export fetchFn) */
+  --pass-display: var(--font-pass-display), "Grotap", "Arial Narrow", system-ui, sans-serif;
+  --pass-sans: var(--font-pass-sans), "DM Sans", system-ui, sans-serif;
+  --pass-cta-font: var(--font-pass-cta), "Poppins", system-ui, sans-serif;
+  --pass-dot: var(--font-pass-dot), "Doto", ui-monospace, monospace;
+}
+
+.pass-card.is-exporting *,
+.pass-card.is-exporting *::before,
+.pass-card.is-exporting *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Keep sans UI text on Poppins; headline stays on Grotap via --pass-display */
+.pass-card.is-exporting .pass-detail-value,
+.pass-card.is-exporting .pass-detail-label,
+.pass-card.is-exporting .pass-tagline,
+.pass-card.is-exporting .pass-pill,
+.pass-card.is-exporting .pass-brand-pass,
+.pass-card.is-exporting .pass-member-no,
+.pass-card.is-exporting .pass-footer-note {
+  font-family: var(--font-pass-cta), "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+.pass-card.is-exporting .pass-headline {
+  font-family: var(--font-pass-display), "Grotap", "Arial Narrow", system-ui, sans-serif !important;
+}
+
+.pass-card.is-exporting .pass-glass,
+.pass-card.is-exporting .pass-pill {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--glass-fill-strong);
+}
+
+.pass-card.is-exporting .pass-mascot-fade {
+  display: none;
+}
+
+.pass-card-wrap:has(.pass-card.is-exporting) {
+  filter: none !important;
+  transform: none !important;
+}
+
+/* Actions — single download CTA + glass share */
+.pass-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 332px;
+  margin: 0 auto;
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+}
+
+.pass-primary {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--pass-cta);
+  font-family: var(--pass-cta-font);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  box-shadow: 0 0 22px rgba(106, 44, 245, 0.28);
+}
+
+.pass-share {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 14px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass-fill);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 6px 14px rgba(21, 10, 58, 0.35);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #fff;
+  cursor: pointer;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .pass-share {
+    background: var(--glass-fill-strong);
+  }
+}
+
+.pass-share:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: var(--glass-fill-strong);
+}
+
+.pass-share-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.pass-primary:focus-visible,
+.pass-share:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+
+.pass-primary:active,
+.pass-share:active {
+  transform: scale(0.98);
+}
+
+.pass-share[aria-busy="true"] {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+/* Share sheet */
+.pass-share-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+}
+
+.pass-share-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(12, 6, 32, 0.62);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.pass-share-panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 360px);
+  padding: 18px 16px 14px;
+  border-radius: 22px;
+  border: 1px solid var(--glass-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05)),
+    rgba(28, 14, 72, 0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 24px 48px rgba(8, 3, 28, 0.55);
+  color: var(--ink-100);
+  animation: pass-share-in 280ms var(--pass-ease) both;
+}
+
+.pass-share-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pass-share-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.pass-share-dismiss {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ink-200);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pass-share-feedback {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(168, 224, 90, 0.16);
+  color: #d8f5a0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.pass-share-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pass-share-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms var(--pass-ease), border-color 160ms var(--pass-ease);
+}
+
+.pass-share-action:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.pass-share-action:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+.pass-share-action:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+
+.pass-share-action-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.pass-share-action-icon.is-whatsapp {
+  background: rgba(37, 211, 102, 0.18);
+  color: #25d366;
+}
+
+.pass-share-action-icon.is-instagram {
+  background: linear-gradient(
+    135deg,
+    rgba(253, 29, 29, 0.2),
+    rgba(193, 53, 132, 0.22),
+    rgba(131, 58, 180, 0.22)
+  );
+  color: #f77737;
+}
+
+.pass-share-action-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pass-share-action-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.pass-share-action-hint {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-300);
+}
+
+@keyframes pass-share-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pass-share-panel {
+    animation: none;
+  }
+}
+
+@keyframes pass-card-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pass-mesh-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(2%, -1.5%, 0) scale(1.04); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes pass-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.85); }
+}
+
+@keyframes pass-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes pass-mascot-in {
+  from {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes pass-write-on {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.4;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+@keyframes pass-underline {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes pass-pill-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.86) translateY(8px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.04) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pass-screen.is-ready .pass-card,
+  .pass-screen.is-ready .pass-mesh,
+  .pass-screen.is-ready .pass-live-dot,
+  .pass-screen.is-ready .pass-headline,
+  .pass-screen.is-ready .pass-tagline,
+  .pass-screen.is-ready .pass-mascot,
+  .pass-screen.is-ready .pass-details .pass-detail-row:first-child .pass-detail-value,
+  .pass-screen.is-ready .pass-name-line,
+  .pass-screen.is-ready .pass-detail-pair,
+  .pass-screen.is-ready .pass-pill {
+    animation: none !important;
+  }
+
+  .pass-screen.is-ready .pass-card {
+    opacity: 1;
+    transform: none;
+  }
+
+  .pass-screen.is-ready .pass-card-wrap.is-tilt-ready .pass-card,
+  .pass-card-wrap.is-tilt-ready:hover .pass-card {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .pass-card {
+    width: min(100%, 332px);
+  }
+
+  .pass-headline {
+    font-size: 46px;
+  }
+}

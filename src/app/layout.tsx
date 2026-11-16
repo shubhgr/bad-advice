@@ -1,10 +1,61 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import localFont from "next/font/local";
+import {
+  Caveat,
+  DM_Sans,
+  Doto,
+  Geist,
+  Geist_Mono,
+  Poppins,
+} from "next/font/google";
 import "./globals.css";
+import "./receipt.css";
+import "./pass.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const caveat = Caveat({
+  variable: "--font-hand",
+  subsets: ["latin"],
+  weight: ["500", "700"],
+});
+
+const grotap = localFont({
+  src: [
+    {
+      path: "../../public/fonts/pass/grotap/Grotap-Bold.otf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-pass-display",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-pass-sans",
+  subsets: ["latin"],
+  weight: ["500", "600"],
+});
+
+const doto = Doto({
+  variable: "--font-pass-dot",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
+
+const poppins = Poppins({
+  variable: "--font-pass-cta",
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -21,7 +72,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} h-full antialiased bg-background`}
+      className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} ${grotap.variable} ${dmSans.variable} ${doto.variable} ${poppins.variable} h-full antialiased bg-background`}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
