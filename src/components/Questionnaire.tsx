@@ -205,9 +205,9 @@ export default function Questionnaire({ onSubmit }: QuestionnaireProps) {
               <div className="option-grid">
                 {currentStep.options.map((option, index) => {
                   const isFullWidth =
-                    (currentStep.field === "whatsStoppingYou" && index === 0) ||
-                    (currentStep.field === "nextBigMove" &&
-                      index === currentStep.options.length - 1);
+                    (currentStep.field === "whatsStoppingYou" ||
+                      currentStep.field === "nextBigMove") &&
+                    index === currentStep.options.length - 1;
 
                   return (
                     <button

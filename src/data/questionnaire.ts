@@ -69,11 +69,11 @@ export const NEXT_BIG_MOVE_OPTIONS = [
 ];
 
 export const WHATS_STOPPING_YOU_OPTIONS = [
-  "Don't know where to start",
   "Too many options",
   "No time",
   "Can't leave my job",
   "Scared of picking wrong",
+  "Don't know where to start",
 ];
 
 export const AREA_TO_EXPLORE_OPTIONS = [
