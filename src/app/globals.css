@@ -2594,6 +2594,28 @@ select.input-field {
   padding: 0;
 }
 
+.mobile-content.flow-two-content:has(.bad-receipt-screen),
+.mobile-content.flow-two-content:has(.pass-screen) {
+  overflow: hidden;
+  min-height: 0;
+  background: transparent;
+}
+
+.mobile-shell:has(.pass-screen),
+.mobile-shell:has(.pass-screen) .mobile-frame,
+.mobile-shell:has(.pass-screen) .mobile-content,
+.mobile-shell:has(.pass-screen) .flow-two-screen {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.mobile-shell:has(.pass-screen) .mobile-frame {
+  border-left: none !important;
+  border-right: none !important;
+}
+
 .flow-two-screen {
   position: relative;
   display: flex;
@@ -2605,6 +2627,17 @@ select.input-field {
   padding-bottom: 48px;
   box-sizing: border-box;
   gap: 22px;
+}
+
+.flow-two-screen:has(.bad-receipt-screen),
+.flow-two-screen:has(.pass-screen) {
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  padding-bottom: 0;
+  gap: 0;
+  overflow: hidden;
+  align-items: stretch;
 }
 
 .flow-two-logo-link {

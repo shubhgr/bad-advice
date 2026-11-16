@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import Flow2AfterAdvice from "@/components/Flow2AfterAdvice";
 import type { Course } from "@/lib/types";
 
@@ -13,8 +13,18 @@ const TEST_GOOD_ADVICE_HEADING = "Healthcare & Medicine Ahead";
 const TEST_GOOD_ADVICE =
   "Exploring Healthcare & Medicine from running a business is a genuinely good instinct, and focused practical learning is exactly what will open the next door.";
 
+function isPassDeepLink() {
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).get("view") === "pass";
+}
+
 export default function Flow2Page({ programs }: { programs: Course[] }) {
   const [step, setStep] = useState<FlowStep>("bad-advice");
+
+  useLayoutEffect(() => {
+    if (isPassDeepLink()) setStep("after-advice");
+  }, []);
+
   const showMovingGradient = step !== "bad-advice";
   const gradientClassName = [
     "shell-moving-gradient",
