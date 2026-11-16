@@ -120,3 +120,75 @@ export function buildPassTraits(pass: PassCardContent) {
     { id: "move", icon: "rocket" as const, label: pass.betterMove },
   ];
 }
+
+/** Stable ids for the four Pass personality results. */
+export type PassPersonalityId =
+  | "certified-overthinker"
+  | "certified-yapper"
+  | "the-never-settler"
+  | "the-thorough-planner";
+
+export interface PassPersonality {
+  id: PassPersonalityId;
+  title: string;
+  /** Quiz answer pattern that maps to this result. */
+  answerPattern: string;
+  /** Character art for the Pass card mascot. */
+  mascotSrc: string;
+}
+
+const PERSONALITY_ASSET = "/images/pass/personalities";
+
+/**
+ * Personality → character map. Resolve with `getPassPersonality(title)` when
+ * wiring quiz results onto the Pass card.
+ */
+export const PASS_PERSONALITIES: readonly PassPersonality[] = [
+  {
+    id: "certified-overthinker",
+    title: "Certified Overthinker",
+    answerPattern: "Too many options / scared of picking wrong",
+    mascotSrc: `${PERSONALITY_ASSET}/certified-overthinker.png`,
+  },
+  {
+    id: "certified-yapper",
+    title: "Certified Yapper",
+    answerPattern: "A talkative, expressive personality selection",
+    mascotSrc: `${PERSONALITY_ASSET}/certified-yapper.png`,
+  },
+  {
+    id: "the-never-settler",
+    title: "The Never-Settler",
+    answerPattern: "Always looking for growth or a new challenge",
+    mascotSrc: `${PERSONALITY_ASSET}/the-never-settler.png`,
+  },
+  {
+    id: "the-thorough-planner",
+    title: "The Thorough Planner",
+    answerPattern: "Doesn't know where to start / wants to plan before acting",
+    mascotSrc: `${PERSONALITY_ASSET}/the-thorough-planner.png`,
+  },
+] as const;
+
+export const PASS_PERSONALITY_BY_ID: Record<
+  PassPersonalityId,
+  PassPersonality
+> = Object.fromEntries(
+  PASS_PERSONALITIES.map((p) => [p.id, p]),
+) as Record<PassPersonalityId, PassPersonality>;
+
+/** Lookup by Pass headline title (case-insensitive). */
+export function getPassPersonality(
+  title: string | null | undefined,
+): PassPersonality | undefined {
+  const key = title?.trim().toLowerCase();
+  if (!key) return undefined;
+  return PASS_PERSONALITIES.find((p) => p.title.toLowerCase() === key);
+}
+
+/** Mascot path for a title, or undefined if unknown. */
+export function getPassPersonalityMascot(
+  title: string | null | undefined,
+): string | undefined {
+  return getPassPersonality(title)?.mascotSrc;
+}
