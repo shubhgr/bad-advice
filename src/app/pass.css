@@ -243,8 +243,8 @@
 /* Reserved mid band for the absolute mascot — keeps lower stack from colliding */
 .pass-mid-spacer {
   flex: 0 0 auto;
-  height: 122px;
-  min-height: 122px;
+  height: 108px;
+  min-height: 108px;
   pointer-events: none;
 }
 
@@ -379,8 +379,8 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 148px;
-  height: 137px;
+  top: 152px;
+  height: 118px;
   z-index: 1;
   display: flex;
   align-items: center;
@@ -410,7 +410,7 @@
 .pass-mascot {
   position: relative;
   z-index: 1;
-  width: 55%;
+  width: 42%;
   height: 100%;
   object-fit: contain;
   object-position: center center;
