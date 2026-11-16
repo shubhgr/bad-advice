@@ -26,29 +26,54 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   width: 100%;
   height: 100%;
   min-height: 0;
   margin: 0 auto;
   padding:
-    max(8px, env(safe-area-inset-top, 0px))
-    12px
-    max(16px, env(safe-area-inset-bottom, 0px));
+    max(6px, env(safe-area-inset-top, 0px))
+    10px
+    max(10px, env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
-  gap: 16px;
+  gap: 0;
   background: transparent;
   overflow: hidden;
 }
 
-.pass-stage {
-  position: relative;
-  flex: 0 1 auto;
+/* Fills the mobile frame; scales card + CTAs as one unit */
+.pass-fit-viewport {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  overflow: hidden;
+}
+
+/* Natural size in layout; scale + negative margins settle into the frame */
+.pass-fit-scaler {
+  --pass-fit-scale: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  transform: scale(var(--pass-fit-scale));
+  transform-origin: top left;
+  will-change: transform;
+}
+
+.pass-stage {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
   min-height: 0;
   overflow: visible;
   padding-block: 0;
@@ -78,11 +103,11 @@
   isolation: isolate;
   width: 332px;
   height: auto;
-  max-width: 100%;
+  max-width: 332px;
   max-height: none;
   padding: 20px 20px 24px;
   box-sizing: border-box;
-  border-radius: 40px;
+  border-radius: 0;
   color: var(--ink-100);
   overflow: hidden;
   /* Mesh gradient base */
@@ -614,8 +639,14 @@
 .pass-screen.is-ready .pass-pill:nth-child(4) { animation-delay: 560ms; }
 
 /* Export mode — screenshot-friendly (transparent canvas, embeddable fonts) */
+.pass-screen:has(.pass-card.is-exporting) .pass-fit-scaler {
+  transform: none !important;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 .pass-card.is-exporting {
-  /* Keep ticket notches; transparent PNG bg shows through cutouts */
+  /* Ticket notches sit on the solid black export canvas */
   /* Base .pass-card is opacity:0 until enter animation — keep it visible for capture */
   opacity: 1 !important;
   transform: none !important;
@@ -673,10 +704,10 @@
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  width: 100%;
+  width: 332px;
   max-width: 332px;
   margin: 0 auto;
-  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  padding-bottom: 0;
 }
 
 .pass-primary {
@@ -687,7 +718,7 @@
   min-height: 48px;
   min-width: 0;
   padding: 10px 14px;
-  border-radius: 14px;
+  border-radius: 0;
   background: #fff;
   color: var(--pass-cta);
   font-family: var(--pass-cta-font);
@@ -706,7 +737,7 @@
   width: 48px;
   height: 48px;
   padding: 0;
-  border-radius: 14px;
+  border-radius: 0;
   border: 1px solid var(--glass-line);
   background: var(--glass-fill);
   box-shadow:

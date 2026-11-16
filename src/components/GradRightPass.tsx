@@ -223,6 +223,8 @@ export default function GradRightPass({
   const cardRef = useRef<HTMLElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const fitViewportRef = useRef<HTMLDivElement>(null);
+  const fitScalerRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [exporting, setExporting] = useState(false);
@@ -230,6 +232,7 @@ export default function GradRightPass({
   const [shareFeedback, setShareFeedback] = useState<ShareFeedback>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [tiltReady, setTiltReady] = useState(false);
+  const [fitScale, setFitScale] = useState(1);
   const reduceMotionRef = useRef(false);
   const sharePanelRef = useRef<HTMLDivElement>(null);
 
@@ -239,6 +242,61 @@ export default function GradRightPass({
 
   useFitText(titleRef, { maxPx: 35, minPx: 26 });
   // Mission/Match stay fixed 14px Poppins Semibold — no fit-text shrink
+
+  // Scale card + CTAs into the mobile frame. Transform shrinks paint; negative
+  // margins shrink the layout box so flex centering matches the visual size.
+  useLayoutEffect(() => {
+    const viewport = fitViewportRef.current;
+    const scaler = fitScalerRef.current;
+    if (!viewport || !scaler) return;
+
+    let raf = 0;
+    const applyFit = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        if (exporting) {
+          scaler.style.marginRight = "";
+          scaler.style.marginBottom = "";
+          scaler.style.setProperty("--pass-fit-scale", "1");
+          setFitScale(1);
+          return;
+        }
+
+        scaler.style.marginRight = "0px";
+        scaler.style.marginBottom = "0px";
+        scaler.style.setProperty("--pass-fit-scale", "1");
+        void scaler.offsetWidth;
+
+        const naturalW = Math.max(1, scaler.offsetWidth);
+        const naturalH = Math.max(1, scaler.offsetHeight);
+        const availW = Math.max(1, viewport.clientWidth);
+        const availH = Math.max(1, viewport.clientHeight);
+        const next = Math.max(
+          0.55,
+          Math.min(1, availW / naturalW, availH / naturalH),
+        );
+        const rounded = Math.round(next * 1000) / 1000;
+
+        scaler.style.setProperty("--pass-fit-scale", String(rounded));
+        scaler.style.marginRight = `${naturalW * (rounded - 1)}px`;
+        scaler.style.marginBottom = `${naturalH * (rounded - 1)}px`;
+        setFitScale(rounded);
+      });
+    };
+
+    applyFit();
+    const ro = new ResizeObserver(applyFit);
+    ro.observe(viewport);
+    if (cardRef.current) ro.observe(cardRef.current);
+    window.addEventListener("resize", applyFit);
+    void document.fonts.ready.then(applyFit).catch(() => undefined);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener("resize", applyFit);
+    };
+  }, [exporting, ready, pass.personalityTitle, pass.name, pass.mission, pass.match]);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -335,9 +393,9 @@ export default function GradRightPass({
     await waitForNextPaint();
 
     const { domToBlob, domToPng } = await import("modern-screenshot");
-    const rect = card.getBoundingClientRect();
-    const exportHeight = Math.max(1, Math.ceil(rect.height));
-    const exportWidth = Math.max(1, Math.ceil(rect.width) || 332);
+    // Use layout size (not transformed/scaled visual size) for crisp PNG export
+    const exportHeight = Math.max(1, Math.ceil(card.offsetHeight));
+    const exportWidth = Math.max(1, Math.ceil(card.offsetWidth) || 332);
     const grotapFamily = passDisplayFontFamily();
     // Inject Grotap @font-face alongside auto-embedded Poppins/etc.
     // (cssText alone would replace every face — so we append via a style tag on the card.)
@@ -363,8 +421,8 @@ export default function GradRightPass({
 
     const options = {
       scale: EXPORT_SCALE,
-      // Transparent canvas — no purple box behind rounded corners / notches
-      backgroundColor: null,
+      // Solid black behind rounded corners / ticket notches (avoids white gallery fill)
+      backgroundColor: "#000000",
       width: exportWidth,
       height: exportHeight,
       // Serve local Grotap .otf as a data URL so embed does not hang
@@ -417,11 +475,7 @@ export default function GradRightPass({
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/^-|-$/g, "") || "card";
       const fileName = `gradright-pass-${slug}.png`;
-      return {
-        blob,
-        fileName,
-        file: new File([blob], fileName, { type: "image/png" }),
-      };
+      return { blob, fileName };
     } finally {
       grotapStyle.remove();
     }
@@ -433,9 +487,10 @@ export default function GradRightPass({
     link.href = url;
     link.download = fileName;
     link.rel = "noopener";
+    link.target = "_self";
     link.style.display = "none";
     document.body.appendChild(link);
-    // Synchronous click keeps this inside a user-gesture chain where possible
+    // Keep the click in the same turn as the gesture where possible
     link.click();
     window.setTimeout(() => {
       link.remove();
@@ -489,27 +544,8 @@ export default function GradRightPass({
 
     try {
       await waitForNextPaint();
-      const { blob, fileName, file } = await exportPassPng();
-
-      // iOS / some mobile browsers block <a download> — use native share when we can.
-      const isTouch = window.matchMedia("(pointer: coarse)").matches;
-      if (isTouch && navigator.canShare?.({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: "My GradRight Pass",
-          });
-          setSaveState("saved");
-          setShareFeedback("saved");
-          return;
-        } catch (error) {
-          if (error instanceof DOMException && error.name === "AbortError") {
-            setSaveState("idle");
-            return;
-          }
-        }
-      }
-
+      const { blob, fileName } = await exportPassPng();
+      // Always trigger a file download — never open the native share sheet.
       downloadBlob(blob, fileName);
       setSaveState("saved");
       setShareFeedback("saved");
@@ -538,6 +574,17 @@ export default function GradRightPass({
 
   return (
     <div className={`pass-screen${ready ? " is-ready" : ""}`}>
+      <div className="pass-fit-viewport" ref={fitViewportRef}>
+        <div
+          className="pass-fit-scaler"
+          ref={fitScalerRef}
+          data-fit-scale={fitScale}
+          style={
+            {
+              "--pass-fit-scale": String(fitScale),
+            } as React.CSSProperties
+          }
+        >
       <div className="pass-stage">
         <div className="pass-halo" aria-hidden="true" />
         <div
@@ -703,6 +750,8 @@ export default function GradRightPass({
             />
           </svg>
         </button>
+      </div>
+        </div>
       </div>
 
       {shareOpen ? (
