@@ -8,7 +8,11 @@
 
 function doPost(e) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("New Data");
+    if (!sheet) {
+      throw new Error('Sheet "New Data" not found');
+    }
+
     const data = JSON.parse(e.postData.contents);
 
     if (sheet.getLastRow() === 0) {
@@ -29,8 +33,18 @@ function doPost(e) {
       ]);
     }
 
+    const rawTimestamp = data.timestamp || new Date().toISOString();
+    const parsedDate = new Date(rawTimestamp);
+    const timestamp = Number.isNaN(parsedDate.getTime())
+      ? rawTimestamp
+      : Utilities.formatDate(
+          parsedDate,
+          Session.getScriptTimeZone() || "Asia/Kolkata",
+          "dd/MM/yyyy HH:mm:ss",
+        );
+
     sheet.appendRow([
-      data.timestamp || new Date().toISOString(),
+      timestamp,
       data.location || "",
       data.button || "",
       data.name || "",

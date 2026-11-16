@@ -243,8 +243,8 @@
 /* Reserved mid band for the absolute mascot — keeps lower stack from colliding */
 .pass-mid-spacer {
   flex: 0 0 auto;
-  height: 136px;
-  min-height: 136px;
+  height: 122px;
+  min-height: 122px;
   pointer-events: none;
 }
 
@@ -379,7 +379,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 168px;
+  top: 148px;
   height: 137px;
   z-index: 1;
   display: flex;
@@ -424,13 +424,13 @@
 .pass-details {
   position: relative;
   z-index: 2;
-  margin-top: 8px;
-  padding-top: 4px;
+  margin-top: 0;
+  padding-top: 0;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   min-width: 0;
   text-align: center;
 }
@@ -448,14 +448,15 @@
 
 .pass-details > .pass-detail-row:first-child {
   gap: 0;
+  margin-top: -6px;
 }
 
 .pass-details > .pass-detail-row:first-child .pass-detail-value.is-name {
-  margin-top: -2px;
+  margin-top: 0;
 }
 
 .pass-details > .pass-detail-row:first-child .pass-name-line {
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .pass-detail-label {

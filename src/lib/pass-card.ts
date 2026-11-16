@@ -198,7 +198,8 @@ export function getPassPersonalityMascot(
 function shortFoodLabel(weirdCombination: string): string {
   const first = weirdCombination.split("+")[0]?.trim();
   if (!first) return "Snack energy";
-  return `${first} chaos`.slice(0, 16);
+  const word = first.split(/\s+/)[0] || first;
+  return `${word} chaos`.slice(0, 14);
 }
 
 function memberNoFromName(name: string): string {
