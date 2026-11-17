@@ -37,8 +37,8 @@ const PREVIEW_BY_PERSONALITY: Record<PassPersonalityId, UserResponses> = {
   "the-never-settler": {
     name: "Aarav",
     careerStage: "Working professional",
-    bollywoodCharacter: "Rancho",
-    superpower: "Time travel",
+    bollywoodCharacter: "Om",
+    superpower: "Invisibility",
     weirdCombination: "Maggi + ice cream",
     nextBigMove: "Switch career paths",
     whatsStoppingYou: "Can't leave my job",
@@ -46,11 +46,29 @@ const PREVIEW_BY_PERSONALITY: Record<PassPersonalityId, UserResponses> = {
   "the-thorough-planner": {
     name: "Aarav",
     careerStage: "Working professional",
-    bollywoodCharacter: "Rancho",
-    superpower: "Time travel",
+    bollywoodCharacter: "Om",
+    superpower: "Invisibility",
     weirdCombination: "Maggi + ice cream",
     nextBigMove: "Going back to college",
     whatsStoppingYou: "Don't know where to start",
+  },
+  "the-impulsive-one": {
+    name: "Aarav",
+    careerStage: "Working professional",
+    bollywoodCharacter: "Raju",
+    superpower: "Teleportation",
+    weirdCombination: "Fries + Ice Cream",
+    nextBigMove: "Switch career paths",
+    whatsStoppingYou: "No time",
+  },
+  "the-free-spirit": {
+    name: "Aarav",
+    careerStage: "Working professional",
+    bollywoodCharacter: "Rancho",
+    superpower: "Shape-shifting",
+    weirdCombination: "Pineapple on Pizza",
+    nextBigMove: "Grow in my current role",
+    whatsStoppingYou: "No time",
   },
 };
 

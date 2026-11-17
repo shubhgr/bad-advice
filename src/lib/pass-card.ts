@@ -19,12 +19,14 @@ export type PassTraitIcon = "lightning" | "search" | "tabs" | "rocket";
 
 export type PassMascotGender = "female" | "male";
 
-/** Stable ids for the four Pass personality results. */
+/** Stable ids for Pass personality results. */
 export type PassPersonalityId =
   | "certified-overthinker"
   | "certified-yapper"
   | "the-never-settler"
-  | "the-thorough-planner";
+  | "the-thorough-planner"
+  | "the-impulsive-one"
+  | "the-free-spirit";
 
 /** Kept for config continuity (coupon lives off-card for now). */
 export const PASS_UNLOCK_TRIGGER: "download" | "print" | "either" = "download";
@@ -149,26 +151,40 @@ export const PASS_PERSONALITIES: readonly PassPersonality[] = [
   {
     id: "certified-overthinker",
     title: "Certified Overthinker",
-    answerPattern: "Too many options / scared of picking wrong",
+    answerPattern: "Too many options / Scared of picking wrong",
     mascotSrc: `${PERSONALITY_ASSET}/certified-overthinker.png`,
   },
   {
     id: "certified-yapper",
     title: "Certified Yapper",
-    answerPattern: "A talkative, expressive personality selection",
+    answerPattern: "Talkative, expressive personality",
     mascotSrc: `${PERSONALITY_ASSET}/certified-yapper.png`,
   },
   {
     id: "the-never-settler",
     title: "The Never-Settler",
-    answerPattern: "Always looking for growth or a new challenge",
+    answerPattern: "Always looking for what's next.",
     mascotSrc: `${PERSONALITY_ASSET}/the-never-settler.png`,
   },
   {
     id: "the-thorough-planner",
     title: "The Thorough Planner",
-    answerPattern: "Doesn't know where to start / wants to plan before acting",
+    answerPattern: "Plans before taking the first step.",
     mascotSrc: `${PERSONALITY_ASSET}/the-thorough-planner.png`,
+  },
+  {
+    id: "the-impulsive-one",
+    title: "The Impulsive One",
+    answerPattern: "Decides first. Processes later.",
+    // Placeholder until dedicated art lands
+    mascotSrc: `${PERSONALITY_ASSET}/certified-yapper.png`,
+  },
+  {
+    id: "the-free-spirit",
+    title: "The Free Spirit",
+    answerPattern: "Has a plan. Open to changing it.",
+    // Placeholder until dedicated art lands
+    mascotSrc: `${PERSONALITY_ASSET}/the-never-settler.png`,
   },
 ] as const;
 
@@ -215,6 +231,7 @@ function resolvePersonalityId(responses: UserResponses): PassPersonalityId {
   const blocker = responses.whatsStoppingYou.trim().toLowerCase();
   const move = responses.nextBigMove.trim().toLowerCase();
   const character = responses.bollywoodCharacter.toLowerCase();
+  const power = responses.superpower.toLowerCase();
 
   if (
     blocker.includes("too many options") ||
@@ -223,14 +240,35 @@ function resolvePersonalityId(responses: UserResponses): PassPersonalityId {
     return "certified-overthinker";
   }
 
-  if (blocker.includes("don't know where to start") || blocker.includes("dont know where to start")) {
+  if (
+    blocker.includes("don't know where to start") ||
+    blocker.includes("dont know where to start")
+  ) {
     return "the-thorough-planner";
+  }
+
+  // Decides first — chaotic / action-first signals
+  if (
+    character.includes("raju") ||
+    power.includes("teleport") ||
+    power.includes("flying")
+  ) {
+    return "the-impulsive-one";
+  }
+
+  // Open to changing the plan
+  if (
+    character.includes("rancho") ||
+    power.includes("shape-shifting") ||
+    power.includes("immortality")
+  ) {
+    return "the-free-spirit";
   }
 
   if (
     character.includes("geet") ||
     character.includes("bunny") ||
-    responses.superpower.toLowerCase().includes("read minds")
+    power.includes("read minds")
   ) {
     return "certified-yapper";
   }
