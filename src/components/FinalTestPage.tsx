@@ -126,7 +126,7 @@ export default function FinalTestPage({ programs }: { programs: Course[] }) {
                     onClick={() => setShowGoodAdvice(true)}
                     className="btn-accent"
                   >
-                    Now let&apos;s fix that
+                    See my report card
                   </button>
                 </div>
               </div>

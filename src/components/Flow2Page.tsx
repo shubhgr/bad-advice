@@ -121,7 +121,7 @@ export default function Flow2Page({ programs }: { programs: Course[] }) {
                     onClick={() => setStep("after-advice")}
                     className="btn-accent"
                   >
-                    Now let&apos;s fix that
+                    See my report card
                   </button>
                 </div>
               </div>

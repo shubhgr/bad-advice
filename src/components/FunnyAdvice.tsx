@@ -37,7 +37,7 @@ export default function FunnyAdvice({
           >
             {isLoadingRecommendations
               ? "Please wait..."
-              : "Now let's fix that"}
+              : "See my report card"}
           </button>
         </div>
       </div>
