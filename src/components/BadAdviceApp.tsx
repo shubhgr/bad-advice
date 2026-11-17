@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import LandingPage from "@/components/LandingPage";
 import FunnyAdvice from "@/components/FunnyAdvice";
 import Flow2AfterAdvice from "@/components/Flow2AfterAdvice";
 import GettingAdvice from "@/components/GettingAdvice";
@@ -11,7 +10,6 @@ import { Course, UserResponses } from "@/lib/types";
 import { captureTrackingFromLocation } from "@/lib/utm";
 
 type Step =
-  | "landing"
   | "questionnaire"
   | "getting-advice"
   | "funny-advice"
@@ -19,7 +17,7 @@ type Step =
   | "flow-2";
 
 export default function BadAdviceApp() {
-  const [step, setStep] = useState<Step>("landing");
+  const [step, setStep] = useState<Step>("questionnaire");
   const [responses, setResponses] = useState<UserResponses | null>(null);
   const [advice, setAdvice] = useState("");
   const [adviceHeadline, setAdviceHeadline] = useState("");
@@ -167,10 +165,6 @@ export default function BadAdviceApp() {
             <div className="mb-6 border border-white/30 bg-white/10 px-4 py-3 text-center text-sm text-white">
               {error}
             </div>
-          )}
-
-          {step === "landing" && (
-            <LandingPage onStart={() => setStep("questionnaire")} />
           )}
 
           {step === "questionnaire" && (
