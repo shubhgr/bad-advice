@@ -58,7 +58,7 @@ export const PLACEHOLDER_PASS: PassCardContent = {
   betterMove: "Fit around job",
   name: "Aarav",
   memberNo: "4827",
-  tagline: "Your GradRight personality",
+  tagline: "Too many options / Scared of picking wrong",
 };
 
 /**
@@ -176,15 +176,13 @@ export const PASS_PERSONALITIES: readonly PassPersonality[] = [
     id: "the-impulsive-one",
     title: "The Impulsive One",
     answerPattern: "Decides first. Processes later.",
-    // Placeholder until dedicated art lands
-    mascotSrc: `${PERSONALITY_ASSET}/certified-yapper.png`,
+    mascotSrc: `${PERSONALITY_ASSET}/the-impulsive-one.png`,
   },
   {
     id: "the-free-spirit",
     title: "The Free Spirit",
     answerPattern: "Has a plan. Open to changing it.",
-    // Placeholder until dedicated art lands
-    mascotSrc: `${PERSONALITY_ASSET}/the-never-settler.png`,
+    mascotSrc: `${PERSONALITY_ASSET}/the-free-spirit.png`,
   },
 ] as const;
 
@@ -377,7 +375,7 @@ export function buildPassFromResponses(
     betterMove: betterMoveFromAnswers(responses),
     name: displayName,
     memberNo: memberNoFromName(displayName),
-    tagline: "Your GradRight personality",
+    tagline: personality.answerPattern,
     personalityId,
   };
 }
