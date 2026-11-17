@@ -655,7 +655,11 @@ export default function GradRightPass({
                 <img
                   src={mascotSrc}
                   alt="GradRight pass mascot"
-                  className="pass-mascot"
+                  className={`pass-mascot${
+                    pass.personalityId === "the-never-settler"
+                      ? " is-never-settler"
+                      : ""
+                  }`}
                   draggable={false}
                 />
               </div>

@@ -427,6 +427,12 @@
     drop-shadow(0 10px 24px rgba(27, 14, 74, 0.45));
 }
 
+/* Never-Settler art has extra top padding — nudge only this expression up */
+.pass-mascot.is-never-settler {
+  object-position: center 62%;
+  transform: translateY(-14px);
+}
+
 /* —— Details ——
    Clear of mascot fade; space groups NAME → MISSION|MATCH → pills. */
 .pass-details {

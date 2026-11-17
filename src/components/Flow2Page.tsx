@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Flow2AfterAdvice from "@/components/Flow2AfterAdvice";
-import type { Course } from "@/lib/types";
+import type { Course, UserResponses } from "@/lib/types";
+import type { PassPersonalityId } from "@/lib/pass-card";
 
 type FlowStep = "bad-advice" | "after-advice";
 
@@ -13,15 +14,59 @@ const TEST_GOOD_ADVICE_HEADING = "Healthcare & Medicine Ahead";
 const TEST_GOOD_ADVICE =
   "Exploring Healthcare & Medicine from running a business is a genuinely good instinct, and focused practical learning is exactly what will open the next door.";
 
-function initialFlowStep(): FlowStep {
-  if (typeof window === "undefined") return "bad-advice";
-  return new URLSearchParams(window.location.search).get("view") === "pass"
-    ? "after-advice"
-    : "bad-advice";
-}
+/** Preview fixtures for `/flow-2?view=pass&personality=…` */
+const PREVIEW_BY_PERSONALITY: Record<PassPersonalityId, UserResponses> = {
+  "certified-overthinker": {
+    name: "Aarav",
+    careerStage: "Working professional",
+    bollywoodCharacter: "Rancho",
+    superpower: "Time travel",
+    weirdCombination: "Maggi + ice cream",
+    nextBigMove: "Going back to college",
+    whatsStoppingYou: "Too many options",
+  },
+  "certified-yapper": {
+    name: "Aarav",
+    careerStage: "Working professional",
+    bollywoodCharacter: "Geet",
+    superpower: "Read minds",
+    weirdCombination: "Maggi + ice cream",
+    nextBigMove: "Going back to college",
+    whatsStoppingYou: "No time",
+  },
+  "the-never-settler": {
+    name: "Aarav",
+    careerStage: "Working professional",
+    bollywoodCharacter: "Rancho",
+    superpower: "Time travel",
+    weirdCombination: "Maggi + ice cream",
+    nextBigMove: "Switch career paths",
+    whatsStoppingYou: "Can't leave my job",
+  },
+  "the-thorough-planner": {
+    name: "Aarav",
+    careerStage: "Working professional",
+    bollywoodCharacter: "Rancho",
+    superpower: "Time travel",
+    weirdCombination: "Maggi + ice cream",
+    nextBigMove: "Going back to college",
+    whatsStoppingYou: "Don't know where to start",
+  },
+};
 
 export default function Flow2Page({ programs }: { programs: Course[] }) {
-  const [step, setStep] = useState<FlowStep>(initialFlowStep);
+  const [step, setStep] = useState<FlowStep>("bad-advice");
+  const [previewResponses, setPreviewResponses] =
+    useState<UserResponses | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("view") === "pass") setStep("after-advice");
+    const id = params.get("personality") as PassPersonalityId | null;
+    if (id && id in PREVIEW_BY_PERSONALITY) {
+      setPreviewResponses(PREVIEW_BY_PERSONALITY[id]);
+    }
+  }, []);
 
   const showMovingGradient = step !== "bad-advice";
   const gradientClassName = [
@@ -89,6 +134,7 @@ export default function Flow2Page({ programs }: { programs: Course[] }) {
               advice={TEST_GOOD_ADVICE}
               programs={programs}
               trackLocation="flow-2"
+              responses={previewResponses}
             />
           )}
         </main>
