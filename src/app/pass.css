@@ -427,10 +427,10 @@
     drop-shadow(0 10px 24px rgba(27, 14, 74, 0.45));
 }
 
-/* Never-Settler art has extra top padding — nudge only this expression up */
+/* Never-Settler art has extra top padding — nudge only this expression up + left */
 .pass-mascot.is-never-settler {
-  object-position: center 62%;
-  transform: translateY(-14px);
+  object-position: center 90%;
+  transform: translate(-10px, -40px);
 }
 
 /* —— Details ——
