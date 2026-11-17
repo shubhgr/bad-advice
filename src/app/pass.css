@@ -526,10 +526,21 @@
 
 .pass-detail-value.is-mission,
 .pass-detail-value.is-match {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: 0.01em;
+}
+
+/* Keep Mission + Match on one line so columns stay visually even */
+.pass-detail-value.is-mission .pass-detail-clamp,
+.pass-detail-value.is-match .pass-detail-clamp {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pass-name-line {

@@ -269,9 +269,9 @@ function matchFromMove(nextBigMove: string): string {
     case "Grow in my current role":
       return "Online programs";
     case "Switch career paths":
-      return "Career-fit programs";
+      return "Career-fit paths";
     case "Going back to college":
-      return "Degree-ready programs";
+      return "Degree programs";
     default:
       return "Online programs";
   }
