@@ -2596,9 +2596,33 @@ select.input-field {
 
 .mobile-content.flow-two-content:has(.bad-receipt-screen),
 .mobile-content.flow-two-content:has(.pass-screen) {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overscroll-behavior: none;
+  height: 100%;
+  max-height: 100%;
   min-height: 0;
   background: transparent;
+}
+
+/* Only unlock vertical scroll when Pass content actually overflows the frame */
+.mobile-content.flow-two-content:has(.pass-screen.is-scrollable) {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+html:has(.pass-screen),
+body:has(.pass-screen) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.mobile-shell:has(.pass-screen),
+.mobile-shell:has(.pass-screen) .mobile-frame {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 .mobile-shell:has(.pass-screen),

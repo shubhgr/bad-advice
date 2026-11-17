@@ -1,31 +1,18 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import {
-  Caveat,
-  DM_Sans,
-  Doto,
-  Geist,
-  Geist_Mono,
-  Poppins,
-} from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import "./receipt.css";
 import "./pass.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const caveat = Caveat({
+const caveat = localFont({
+  src: [
+    { path: "../fonts/caveat/500.ttf", weight: "500", style: "normal" },
+    { path: "../fonts/caveat/700.ttf", weight: "700", style: "normal" },
+  ],
   variable: "--font-hand",
-  subsets: ["latin"],
-  weight: ["500", "700"],
+  display: "swap",
 });
 
 const grotap = localFont({
@@ -40,22 +27,34 @@ const grotap = localFont({
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const dmSans = localFont({
+  src: [
+    { path: "../fonts/dm-sans/500.ttf", weight: "500", style: "normal" },
+    { path: "../fonts/dm-sans/600.ttf", weight: "600", style: "normal" },
+  ],
   variable: "--font-pass-sans",
-  subsets: ["latin"],
-  weight: ["500", "600"],
+  display: "swap",
 });
 
-const doto = Doto({
+const doto = localFont({
+  src: [
+    { path: "../fonts/doto/400.ttf", weight: "400", style: "normal" },
+    { path: "../fonts/doto/500.ttf", weight: "500", style: "normal" },
+    { path: "../fonts/doto/600.ttf", weight: "600", style: "normal" },
+  ],
   variable: "--font-pass-dot",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
-const poppins = Poppins({
+const poppins = localFont({
+  src: [
+    { path: "../fonts/poppins/500.ttf", weight: "500", style: "normal" },
+    { path: "../fonts/poppins/600.ttf", weight: "600", style: "normal" },
+    { path: "../fonts/poppins/700.ttf", weight: "700", style: "normal" },
+    { path: "../fonts/poppins/800.ttf", weight: "800", style: "normal" },
+  ],
   variable: "--font-pass-cta",
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -72,7 +71,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} ${grotap.variable} ${dmSans.variable} ${doto.variable} ${poppins.variable} h-full antialiased bg-background`}
+      className={`${GeistSans.variable} ${GeistMono.variable} ${caveat.variable} ${grotap.variable} ${dmSans.variable} ${doto.variable} ${poppins.variable} h-full antialiased bg-background`}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />

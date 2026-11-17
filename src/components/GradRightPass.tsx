@@ -3,7 +3,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import Image from "next/image";
-import { Poppins } from "next/font/google";
 import { useAppStoreUrl } from "@/hooks/useAppStoreUrl";
 import { trackAppDownloadClick } from "@/lib/track";
 import {
@@ -14,12 +13,6 @@ import {
   type PassTraitIcon,
 } from "@/lib/pass-card";
 import type { UserResponses } from "@/lib/types";
-
-const passPoppins = Poppins({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  display: "swap",
-});
 
 const EXPORT_SCALE = 2;
 const ASSET = "/images/pass/figma";
@@ -265,6 +258,7 @@ export default function GradRightPass({
           scaler.style.marginBottom = "";
           scaler.style.setProperty("--pass-fit-scale", "1");
           setFitScale(1);
+          viewport.closest(".pass-screen")?.classList.remove("is-scrollable");
           return;
         }
 
@@ -287,6 +281,14 @@ export default function GradRightPass({
         scaler.style.marginRight = `${naturalW * (rounded - 1)}px`;
         scaler.style.marginBottom = `${naturalH * (rounded - 1)}px`;
         setFitScale(rounded);
+
+        // Scroll only when scaled content still taller than the frame
+        const fittedH = naturalH * rounded;
+        const needsScroll = fittedH > availH + 1;
+        viewport.closest(".pass-screen")?.classList.toggle(
+          "is-scrollable",
+          needsScroll,
+        );
       });
     };
 
@@ -662,7 +664,7 @@ export default function GradRightPass({
                 <div className="pass-detail-row">
                   <span className="pass-detail-label">Name</span>
                   <p
-                    className={`pass-detail-value is-name ${passPoppins.className}`}
+                    className="pass-detail-value is-name"
                     title={pass.name || undefined}
                   >
                     <span className="pass-detail-clamp">{pass.name}</span>
@@ -673,7 +675,7 @@ export default function GradRightPass({
                   <div className="pass-detail-row">
                     <span className="pass-detail-label">Mission</span>
                     <p
-                      className={`pass-detail-value is-mission ${passPoppins.className}`}
+                      className="pass-detail-value is-mission"
                       title={pass.mission || undefined}
                     >
                       <span className="pass-detail-clamp">{pass.mission}</span>
@@ -682,7 +684,7 @@ export default function GradRightPass({
                   <div className="pass-detail-row">
                     <span className="pass-detail-label">Match</span>
                     <p
-                      className={`pass-detail-value is-match ${passPoppins.className}`}
+                      className="pass-detail-value is-match"
                       title={pass.match || undefined}
                     >
                       <span className="pass-detail-clamp">{pass.match}</span>
@@ -700,7 +702,7 @@ export default function GradRightPass({
                 ))}
               </div>
 
-              <p className={`pass-footer-note ${passPoppins.className}`}>
+              <p className="pass-footer-note">
                 Screenshot this. You will need it later.
               </p>
             </div>
@@ -770,7 +772,7 @@ export default function GradRightPass({
           />
           <div
             ref={sharePanelRef}
-            className={`pass-share-panel ${passPoppins.className}`}
+            className="pass-share-panel"
             role="dialog"
             aria-modal="true"
             aria-labelledby="pass-share-title"
