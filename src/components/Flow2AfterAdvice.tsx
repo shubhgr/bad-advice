@@ -24,17 +24,7 @@ export default function Flow2AfterAdvice({
   void _programs;
 
   return (
-    <section
-      className="flow-two-screen animate-fade-in is-receipt is-pass"
-      style={{
-        boxSizing: "border-box",
-        paddingBottom: 0,
-        position: "relative",
-        height: "100%",
-        minHeight: 0,
-        overflow: "hidden",
-      }}
-    >
+    <section className="flow-two-screen animate-fade-in is-receipt is-pass">
       <GradRightPass trackLocation={trackLocation} responses={responses} />
     </section>
   );

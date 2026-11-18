@@ -222,7 +222,9 @@ export default function GradRightPass({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const fitViewportRef = useRef<HTMLDivElement>(null);
   const fitScalerRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
+  const [ctaPadTop, setCtaPadTop] = useState(12);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [exporting, setExporting] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -231,6 +233,10 @@ export default function GradRightPass({
   const [tiltReady, setTiltReady] = useState(false);
   const [fitScale, setFitScale] = useState(1);
   const reduceMotionRef = useRef(false);
+  const exportingRef = useRef(false);
+  const gyroActiveRef = useRef(false);
+  const gyroTargetRef = useRef({ x: 0, y: 0 });
+  const gyroCurrentRef = useRef({ x: 0, y: 0 });
   const sharePanelRef = useRef<HTMLDivElement>(null);
 
   const pass = buildPassFromResponses(responses);
@@ -242,14 +248,21 @@ export default function GradRightPass({
   useFitText(titleRef, { maxPx: 35, minPx: 26 });
   // Mission/Match stay fixed 14px Poppins Semibold — no fit-text shrink
 
-  // Scale card + CTAs into the mobile frame. Transform shrinks paint; negative
-  // margins shrink the layout box so flex centering matches the visual size.
+  // Scale the Pass card into the flex slot above the CTA dock.
+  // Tall phones: scale UP (capped) + grow CTA padding. Short phones: scale DOWN.
   useLayoutEffect(() => {
+    const screen = fitViewportRef.current?.closest(".pass-screen") as HTMLElement | null;
     const viewport = fitViewportRef.current;
     const scaler = fitScalerRef.current;
-    if (!viewport || !scaler) return;
+    const actions = actionsRef.current;
+    if (!screen || !viewport || !scaler || !actions) return;
 
     let raf = 0;
+    const MIN_SCALE = 0.55;
+    const MAX_SCALE = 1.22;
+    const MIN_CTA_PAD = 12;
+    const MAX_CTA_PAD = 48;
+
     const applyFit = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
@@ -257,43 +270,55 @@ export default function GradRightPass({
           scaler.style.marginRight = "";
           scaler.style.marginBottom = "";
           scaler.style.setProperty("--pass-fit-scale", "1");
+          actions.style.paddingTop = `${MIN_CTA_PAD}px`;
           setFitScale(1);
-          viewport.closest(".pass-screen")?.classList.remove("is-scrollable");
+          setCtaPadTop(MIN_CTA_PAD);
+          screen.classList.remove("is-scrollable");
           return;
         }
 
+        // Measure at min CTA pad + natural card size
+        actions.style.paddingTop = `${MIN_CTA_PAD}px`;
         scaler.style.marginRight = "0px";
         scaler.style.marginBottom = "0px";
         scaler.style.setProperty("--pass-fit-scale", "1");
         void scaler.offsetWidth;
+        void actions.offsetHeight;
 
         const naturalW = Math.max(1, scaler.offsetWidth);
         const naturalH = Math.max(1, scaler.offsetHeight);
-        const availW = Math.max(1, viewport.clientWidth);
-        const availH = Math.max(1, viewport.clientHeight);
+        const availW = Math.max(1, screen.clientWidth);
+        const dockH = Math.max(1, actions.offsetHeight);
+        // Card budget = screen minus CTA dock (stable; avoids pad/scale feedback loop)
+        const cardBudget = Math.max(1, screen.clientHeight - dockH);
+
         const next = Math.max(
-          0.55,
-          Math.min(1, availW / naturalW, availH / naturalH),
+          MIN_SCALE,
+          Math.min(MAX_SCALE, availW / naturalW, cardBudget / naturalH),
         );
         const rounded = Math.round(next * 1000) / 1000;
 
         scaler.style.setProperty("--pass-fit-scale", String(rounded));
         scaler.style.marginRight = `${naturalW * (rounded - 1)}px`;
         scaler.style.marginBottom = `${naturalH * (rounded - 1)}px`;
-        setFitScale(rounded);
 
-        // Scroll only when scaled content still taller than the frame
         const fittedH = naturalH * rounded;
-        const needsScroll = fittedH > availH + 1;
-        viewport.closest(".pass-screen")?.classList.toggle(
-          "is-scrollable",
-          needsScroll,
+        const slack = Math.max(0, cardBudget - fittedH);
+        const pad = Math.round(
+          Math.min(MAX_CTA_PAD, Math.max(MIN_CTA_PAD, MIN_CTA_PAD + slack * 0.55)),
         );
+        actions.style.paddingTop = `${pad}px`;
+
+        setFitScale(rounded);
+        setCtaPadTop(pad);
+
+        screen.classList.toggle("is-scrollable", fittedH > cardBudget + 1);
       });
     };
 
     applyFit();
     const ro = new ResizeObserver(applyFit);
+    ro.observe(screen);
     ro.observe(viewport);
     if (cardRef.current) ro.observe(cardRef.current);
     window.addEventListener("resize", applyFit);
@@ -311,11 +336,24 @@ export default function GradRightPass({
     reduceMotionRef.current = mq.matches;
     const onChange = () => {
       reduceMotionRef.current = mq.matches;
-      if (mq.matches) setTilt({ x: 0, y: 0 });
+      if (mq.matches) {
+        gyroTargetRef.current = { x: 0, y: 0 };
+        gyroCurrentRef.current = { x: 0, y: 0 };
+        setTilt({ x: 0, y: 0 });
+      }
     };
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
+
+  useEffect(() => {
+    exportingRef.current = exporting;
+    if (exporting) {
+      gyroTargetRef.current = { x: 0, y: 0 };
+      gyroCurrentRef.current = { x: 0, y: 0 };
+      setTilt({ x: 0, y: 0 });
+    }
+  }, [exporting]);
 
   useEffect(() => {
     trackPassEvent("result_viewed", { location: trackLocation });
@@ -331,6 +369,126 @@ export default function GradRightPass({
       setTiltReady(false);
     };
   }, [ready]);
+
+  // Mobile: DeviceOrientation → same --tilt-x/y as pointer tilt (Zyro-like).
+  useEffect(() => {
+    if (!tiltReady) return;
+
+    type OrientationPermission = {
+      requestPermission?: () => Promise<"granted" | "denied" | "default">;
+    };
+
+    const isTouchPrimary = () =>
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+    if (!isTouchPrimary() || typeof window.DeviceOrientationEvent === "undefined") {
+      return;
+    }
+
+    let listening = false;
+    let cancelled = false;
+    let raf = 0;
+    let baseline: { beta: number; gamma: number } | null = null;
+    const GYRO_RANGE = 18;
+    const MAX_X = 14;
+    const MAX_Y = 16;
+    const LERP = 0.16;
+
+    const clamp = (value: number, max: number) =>
+      Math.max(-max, Math.min(max, value));
+
+    const tick = () => {
+      raf = requestAnimationFrame(tick);
+      if (reduceMotionRef.current || exportingRef.current) {
+        gyroTargetRef.current = { x: 0, y: 0 };
+      }
+      if (!gyroActiveRef.current) return;
+
+      const target = gyroTargetRef.current;
+      const current = gyroCurrentRef.current;
+      current.x += (target.x - current.x) * LERP;
+      current.y += (target.y - current.y) * LERP;
+      if (Math.abs(current.x) < 0.02 && target.x === 0) current.x = 0;
+      if (Math.abs(current.y) < 0.02 && target.y === 0) current.y = 0;
+
+      const nextX = +current.x.toFixed(2);
+      const nextY = +current.y.toFixed(2);
+      setTilt((prev) =>
+        prev.x === nextX && prev.y === nextY ? prev : { x: nextX, y: nextY },
+      );
+    };
+
+    const onOrient = (event: DeviceOrientationEvent) => {
+      if (cancelled || reduceMotionRef.current || exportingRef.current) return;
+      if (!isTouchPrimary()) return;
+
+      const beta = event.beta;
+      const gamma = event.gamma;
+      if (beta == null || gamma == null) return;
+
+      if (!baseline) {
+        baseline = { beta, gamma };
+      }
+
+      const dBeta = beta - baseline.beta;
+      const dGamma = gamma - baseline.gamma;
+      gyroActiveRef.current = true;
+      gyroTargetRef.current = {
+        x: clamp((-dBeta / GYRO_RANGE) * MAX_X, MAX_X),
+        y: clamp((dGamma / GYRO_RANGE) * MAX_Y, MAX_Y),
+      };
+    };
+
+    const startListening = () => {
+      if (listening || cancelled) return;
+      listening = true;
+      baseline = null;
+      window.addEventListener("deviceorientation", onOrient);
+      raf = requestAnimationFrame(tick);
+    };
+
+    const ensurePermissionAndStart = async () => {
+      if (cancelled || reduceMotionRef.current || listening) return;
+      try {
+        const DOE = DeviceOrientationEvent as typeof DeviceOrientationEvent &
+          OrientationPermission;
+        if (typeof DOE.requestPermission === "function") {
+          const result = await DOE.requestPermission();
+          if (result !== "granted") return;
+        }
+        startListening();
+      } catch {
+        // Sensors unavailable / denied — keep pointer fallback only.
+      }
+    };
+
+    const needsPermission =
+      typeof (
+        DeviceOrientationEvent as typeof DeviceOrientationEvent &
+          OrientationPermission
+      ).requestPermission === "function";
+
+    // Android / non-iOS: listen immediately. iOS: wait for a card tap.
+    if (!needsPermission) {
+      void ensurePermissionAndStart();
+    }
+
+    const onGesture = () => {
+      void ensurePermissionAndStart();
+    };
+    const wrap = wrapRef.current;
+    wrap?.addEventListener("pointerdown", onGesture, { passive: true });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      window.removeEventListener("deviceorientation", onOrient);
+      wrap?.removeEventListener("pointerdown", onGesture);
+      gyroActiveRef.current = false;
+      gyroTargetRef.current = { x: 0, y: 0 };
+      gyroCurrentRef.current = { x: 0, y: 0 };
+    };
+  }, [tiltReady]);
 
   useEffect(() => {
     if (saveState !== "saved" && saveState !== "error") return;
@@ -363,6 +521,9 @@ export default function GradRightPass({
   }, [shareOpen]);
 
   function handleTiltMove(event: React.PointerEvent<HTMLDivElement>) {
+    // Touch devices use gyro; keep pointer tilt for mouse/pen only.
+    if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+    if (gyroActiveRef.current) return;
     if (reduceMotionRef.current || exporting || !ready) return;
     const el = wrapRef.current;
     if (!el) return;
@@ -377,6 +538,7 @@ export default function GradRightPass({
   }
 
   function handleTiltLeave() {
+    if (gyroActiveRef.current) return;
     setTilt({ x: 0, y: 0 });
   }
 
@@ -647,8 +809,6 @@ export default function GradRightPass({
                 <p className="pass-tagline">{pass.tagline}</p>
               </div>
 
-              <div className="pass-mid-spacer" aria-hidden="true" />
-
               <div className="pass-mascot-zone">
                 <div className="pass-mascot-glow" aria-hidden="true" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -714,7 +874,15 @@ export default function GradRightPass({
         </div>
       </div>
 
-      <div className="pass-actions" data-export-exclude="">
+        </div>
+      </div>
+
+      <div
+        className="pass-actions"
+        data-export-exclude=""
+        ref={actionsRef}
+        style={{ paddingTop: ctaPadTop }}
+      >
         <a
           href={appStoreUrl}
           target="_blank"
@@ -762,8 +930,6 @@ export default function GradRightPass({
             />
           </svg>
         </button>
-      </div>
-        </div>
       </div>
 
       {shareOpen ? (

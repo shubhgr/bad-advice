@@ -28,22 +28,21 @@
   flex: 1 1 auto;
   flex-direction: column;
   align-items: stretch;
-  justify-content: center;
+  justify-content: flex-start;
   width: 100%;
+  /* Fill the padded mobile-content box (same as first-screen children) */
   height: 100%;
   min-height: 0;
   margin: 0 auto;
-  padding:
-    max(6px, env(safe-area-inset-top, 0px))
-    10px
-    max(10px, env(safe-area-inset-bottom, 0px));
+  /* Inset comes from .mobile-content padding: 20px — don't double it */
+  padding: 0;
   box-sizing: border-box;
   gap: 0;
   background: transparent;
   overflow: hidden;
 }
 
-/* Fills the mobile frame; scales card + CTAs as one unit */
+/* Card slot — flexes; card scales up/down to fill leftover height above CTA */
 .pass-fit-viewport {
   flex: 1 1 auto;
   min-width: 0;
@@ -224,7 +223,7 @@
   animation: pass-mesh-drift 30s linear infinite;
 }
 
-/* Pointer tilt — applied after enter animation settles */
+/* Pointer / gyro tilt — applied after enter animation settles */
 .pass-screen.is-ready .pass-card-wrap.is-tilt-ready .pass-card {
   animation: none;
   opacity: 1;
@@ -249,13 +248,7 @@
   gap: 0;
 }
 
-/* Reserved mid band for the absolute mascot — keeps lower stack from colliding */
-.pass-mid-spacer {
-  flex: 0 0 auto;
-  height: 108px;
-  min-height: 108px;
-  pointer-events: none;
-}
+/* Mid band lives in-flow via .pass-mascot-zone so tagline height pushes it down */
 
 /* —— Top row —— */
 .pass-top-row {
@@ -346,7 +339,7 @@
   position: relative;
   z-index: 3;
   margin-top: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 0;
   margin-inline: auto;
   flex-shrink: 0;
   max-width: 92%;
@@ -386,19 +379,29 @@
   text-shadow: 0 1px 12px rgba(27, 14, 74, 0.85);
 }
 
+.pass-tagline:empty {
+  display: none;
+  margin: 0;
+}
+
 /* —— Mascot —— */
-/* Blob −20% (61% / 152px), soft vignette + bottom dissolve into the plum zone */
+/* In-flow under title/tagline — gap grows automatically with wrapped text */
 .pass-mascot-zone {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 168px;
-  height: 96px;
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  height: 108px;
+  margin-top: 16px;
   z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
+}
+
+/* Extra air when a subline is present (multi-line taglines need more clearance) */
+.pass-title-block:has(.pass-tagline:not(:empty)) + .pass-mascot-zone {
+  margin-top: 24px;
 }
 
 .pass-mascot-glow {
@@ -432,10 +435,11 @@
     drop-shadow(0 10px 24px rgba(27, 14, 74, 0.45));
 }
 
-/* Never-Settler art has extra top padding — nudge only this expression up + left */
+/* Never-Settler art has extra top padding — scale in-band, no upward shove into tagline */
 .pass-mascot.is-never-settler {
-  object-position: center 90%;
-  transform: translate(-10px, -40px);
+  object-position: center 78%;
+  transform: translateX(-6px) scale(1.15);
+  width: 28%;
 }
 
 /* —— Details ——
@@ -728,17 +732,17 @@
   transform: none !important;
 }
 
-/* Actions — same width as the Pass card above */
+/* CTA dock — full content width like landing; padding-top grows on tall phones */
 .pass-actions {
   flex: 0 0 auto;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  width: var(--pass-card-width);
-  max-width: var(--pass-card-width);
-  margin: 0 auto;
-  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 12px 0 0;
   box-sizing: border-box;
 }
 
