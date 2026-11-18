@@ -21,6 +21,7 @@
   --pass-dot: var(--font-pass-dot), "Doto", "DotGothic16", monospace;
   --pass-cta-font: var(--font-pass-cta), "Poppins", system-ui, sans-serif;
   --pass-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --pass-card-width: 332px;
 
   position: relative;
   display: flex;
@@ -109,9 +110,9 @@
 .pass-card {
   position: relative;
   isolation: isolate;
-  width: 332px;
+  width: var(--pass-card-width);
   height: auto;
-  max-width: 332px;
+  max-width: var(--pass-card-width);
   max-height: none;
   padding: 20px 20px 24px;
   box-sizing: border-box;
@@ -727,17 +728,18 @@
   transform: none !important;
 }
 
-/* Actions — single download CTA + glass share */
+/* Actions — same width as the Pass card above */
 .pass-actions {
   flex: 0 0 auto;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  width: 332px;
-  max-width: 332px;
+  width: var(--pass-card-width);
+  max-width: var(--pass-card-width);
   margin: 0 auto;
-  padding-bottom: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .pass-primary {
@@ -749,6 +751,7 @@
   min-width: 0;
   padding: 10px 14px;
   border-radius: 0;
+  box-sizing: border-box;
   background: #fff;
   color: var(--pass-cta);
   font-family: var(--pass-cta-font);
@@ -760,7 +763,7 @@
 }
 
 .pass-share {
-  flex: 0 0 auto;
+  flex: 0 0 48px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -768,6 +771,7 @@
   height: 48px;
   padding: 0;
   border-radius: 0;
+  box-sizing: border-box;
   border: 1px solid var(--glass-line);
   background: var(--glass-fill);
   box-shadow:
@@ -1096,8 +1100,8 @@
 }
 
 @media (max-width: 360px) {
-  .pass-card {
-    width: min(100%, 332px);
+  .pass-screen {
+    --pass-card-width: min(100%, 332px);
   }
 
   .pass-headline {
