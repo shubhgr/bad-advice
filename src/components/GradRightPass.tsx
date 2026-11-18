@@ -232,6 +232,10 @@ export default function GradRightPass({
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [tiltReady, setTiltReady] = useState(false);
   const [fitScale, setFitScale] = useState(1);
+  /** iOS Safari needs a tap + system permission before gyro works */
+  const [motionPrompt, setMotionPrompt] = useState<"hidden" | "tap" | "denied">(
+    "hidden",
+  );
   const reduceMotionRef = useRef(false);
   const exportingRef = useRef(false);
   const gyroActiveRef = useRef(false);
@@ -371,6 +375,8 @@ export default function GradRightPass({
   }, [ready]);
 
   // Mobile: DeviceOrientation → same --tilt-x/y as pointer tilt (Zyro-like).
+  // Android: starts immediately. iPhone/Safari: needs a tap so requestPermission
+  // runs inside a user gesture, then Safari shows Allow / Deny.
   useEffect(() => {
     if (!tiltReady) return;
 
@@ -382,17 +388,24 @@ export default function GradRightPass({
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
     if (!isTouchPrimary() || typeof window.DeviceOrientationEvent === "undefined") {
+      setMotionPrompt("hidden");
       return;
     }
 
     let listening = false;
     let cancelled = false;
+    let gotOrientEvent = false;
     let raf = 0;
+    let waitTimer = 0;
     let baseline: { beta: number; gamma: number } | null = null;
     const GYRO_RANGE = 18;
     const MAX_X = 14;
     const MAX_Y = 16;
     const LERP = 0.16;
+
+    const DOE = DeviceOrientationEvent as typeof DeviceOrientationEvent &
+      OrientationPermission;
+    const needsPermission = typeof DOE.requestPermission === "function";
 
     const clamp = (value: number, max: number) =>
       Math.max(-max, Math.min(max, value));
@@ -426,13 +439,13 @@ export default function GradRightPass({
       const gamma = event.gamma;
       if (beta == null || gamma == null) return;
 
-      if (!baseline) {
-        baseline = { beta, gamma };
-      }
+      gotOrientEvent = true;
+      if (!baseline) baseline = { beta, gamma };
 
       const dBeta = beta - baseline.beta;
       const dGamma = gamma - baseline.gamma;
       gyroActiveRef.current = true;
+      setMotionPrompt("hidden");
       gyroTargetRef.current = {
         x: clamp((-dBeta / GYRO_RANGE) * MAX_X, MAX_X),
         y: clamp((dGamma / GYRO_RANGE) * MAX_Y, MAX_Y),
@@ -440,53 +453,88 @@ export default function GradRightPass({
     };
 
     const startListening = () => {
-      if (listening || cancelled) return;
-      listening = true;
+      if (cancelled) return;
+      if (!listening) {
+        listening = true;
+        window.addEventListener("deviceorientation", onOrient, true);
+        raf = requestAnimationFrame(tick);
+      }
       baseline = null;
-      window.addEventListener("deviceorientation", onOrient);
-      raf = requestAnimationFrame(tick);
     };
 
-    const ensurePermissionAndStart = async () => {
-      if (cancelled || reduceMotionRef.current || listening) return;
+    let requestingPermission = false;
+
+    const requestIosPermission = async () => {
+      if (
+        cancelled ||
+        reduceMotionRef.current ||
+        requestingPermission ||
+        gotOrientEvent ||
+        gyroActiveRef.current
+      ) {
+        return;
+      }
+      requestingPermission = true;
       try {
-        const DOE = DeviceOrientationEvent as typeof DeviceOrientationEvent &
-          OrientationPermission;
-        if (typeof DOE.requestPermission === "function") {
-          const result = await DOE.requestPermission();
-          if (result !== "granted") return;
+        // Must be invoked from a click/tap stack on iOS Safari.
+        const result = await DOE.requestPermission!();
+        if (cancelled) return;
+        if (result === "granted") {
+          setMotionPrompt("hidden");
+          startListening();
+        } else {
+          setMotionPrompt("denied");
         }
-        startListening();
       } catch {
-        // Sensors unavailable / denied — keep pointer fallback only.
+        setMotionPrompt("denied");
+      } finally {
+        requestingPermission = false;
       }
     };
 
-    const needsPermission =
-      typeof (
-        DeviceOrientationEvent as typeof DeviceOrientationEvent &
-          OrientationPermission
-      ).requestPermission === "function";
-
-    // Android / non-iOS: listen immediately. iOS: wait for a card tap.
-    if (!needsPermission) {
-      void ensurePermissionAndStart();
-    }
-
-    const onGesture = () => {
-      void ensurePermissionAndStart();
-    };
     const wrap = wrapRef.current;
-    wrap?.addEventListener("pointerdown", onGesture, { passive: true });
+
+    if (!needsPermission) {
+      // Android / Chrome: no system prompt — start now.
+      setMotionPrompt("hidden");
+      startListening();
+    } else {
+      // iOS: try quietly (already granted on this origin). If no events, ask for a tap.
+      startListening();
+      waitTimer = window.setTimeout(() => {
+        if (!cancelled && !gotOrientEvent) setMotionPrompt("tap");
+      }, 700);
+
+      // click is the reliable user-gesture for Safari's permission sheet.
+      // Skip touchend to avoid double-firing with the synthetic click.
+      const onEnableTap = () => {
+        void requestIosPermission();
+      };
+
+      wrap?.addEventListener("click", onEnableTap);
+
+      return () => {
+        cancelled = true;
+        window.clearTimeout(waitTimer);
+        cancelAnimationFrame(raf);
+        window.removeEventListener("deviceorientation", onOrient, true);
+        wrap?.removeEventListener("click", onEnableTap);
+        gyroActiveRef.current = false;
+        gyroTargetRef.current = { x: 0, y: 0 };
+        gyroCurrentRef.current = { x: 0, y: 0 };
+        setMotionPrompt("hidden");
+      };
+    }
 
     return () => {
       cancelled = true;
+      window.clearTimeout(waitTimer);
       cancelAnimationFrame(raf);
-      window.removeEventListener("deviceorientation", onOrient);
-      wrap?.removeEventListener("pointerdown", onGesture);
+      window.removeEventListener("deviceorientation", onOrient, true);
       gyroActiveRef.current = false;
       gyroTargetRef.current = { x: 0, y: 0 };
       gyroCurrentRef.current = { x: 0, y: 0 };
+      setMotionPrompt("hidden");
     };
   }, [tiltReady]);
 
@@ -759,7 +807,9 @@ export default function GradRightPass({
         <div className="pass-halo" aria-hidden="true" />
         <div
           ref={wrapRef}
-          className={`pass-card-wrap${tiltReady && !exporting ? " is-tilt-ready" : ""}`}
+          className={`pass-card-wrap${tiltReady && !exporting ? " is-tilt-ready" : ""}${
+            motionPrompt === "tap" ? " needs-motion-tap" : ""
+          }`}
           style={
             {
               "--tilt-x": `${tilt.x}deg`,
@@ -770,6 +820,16 @@ export default function GradRightPass({
           onPointerLeave={handleTiltLeave}
           onPointerCancel={handleTiltLeave}
         >
+          {motionPrompt === "tap" && !exporting ? (
+            <p className="pass-motion-hint" role="status">
+              Tap card to enable motion tilt
+            </p>
+          ) : null}
+          {motionPrompt === "denied" && !exporting ? (
+            <p className="pass-motion-hint is-denied" role="status">
+              Motion blocked — enable in iOS Settings → Safari → Motion
+            </p>
+          ) : null}
           <article
             ref={cardRef}
             className={`pass-card${exporting ? " is-exporting" : ""}`}
